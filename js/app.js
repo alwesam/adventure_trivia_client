@@ -226,6 +226,7 @@ var gotoLocation = function (marker) {
           google.maps.event.addListener(target, 'click', function() {
 
             var feedback = answerQuestions(questions);
+            //TODO add reactx
            
             if (feedback) {
               panorama.setVisible(false);
@@ -312,7 +313,7 @@ var requestInfo = function () {
     /* Send an AJAX request to Wikipedia*/
     //TODO complete
     $.ajax({
-       url: wikiURL, 
+       url: railsURL, 
        /*jsonp datatype is specified to be able to pass functions in JSON
         * request*/
        dataType: "json",
