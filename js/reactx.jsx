@@ -1,115 +1,25 @@
-var adventure = {
-  name: "Find Holy Grail",
-  challenges: [
-        {
-          loc: "Rome, Italy",
-          questions: [
-                      {"question" : "What is the capital of Spain?", 
-                       "correctAnswer": "Madrid", 
-                       "answers" :
-                        ["Madrid", 
-                         "London", 
-                         "Istanbul"]
-                      }, 
-
-                      {"question" : "What is the capital of Austria?", 
-                       "correctAnswer" : "Vienna",
-                       "answers" :
-                        ["Madrid", 
-                        "Vienna", 
-                        "Berlin"]
-                      }, 
-
-                      {"question" : "What is the capital of Poland?", 
-                       "correctAnswer" : "Warsaw",
-                       "answers"  :
-                        ["Madrid", 
-                        "Vienna", 
-                        "Warsaw"]
-                      } 
-          ],
-          clue: {"content" : "closest metropolis to the pyramids", "answer" : "cairo"},
-          statusComplete: false
-        }, 
-        {
-          loc: "Giza Necropolis, Giza, Egypt",
-          questions: [
-                      {"question" : "What is the capital of Egypt?", 
-                       "correctAnswer" : "Cairo",
-                       "answers" :
-                        ["Cairo", 
-                         "Amman", 
-                         "Istanbul"]
-                      }, 
-
-                      {"question" : "What is the capital of Iraq?", 
-                       "correctAnswer" : "Baghdad",
-                       "answers" :
-                        ["Baghdad", 
-                        "Damascus", 
-                        "Beirut"]
-                      }, 
-
-                      {"question" : "What is the capital of Libya?", 
-                       "correctAnswer" : "Tripoli",
-                       "answers"  :
-                        ["Cairo", 
-                        "Tripoli", 
-                        "Khartoum"]
-                      } 
-          ],
-          clue: {"content" : "Indian Jones was there", "answer" : "petra"},
-          statusComplete: false
-        }, 
-        {
-          loc: "Petra, Kingdom of Jordan",
-          questions: [
-                      {"question" : "What is the capital of Iran?", 
-                       "correctAnswer" : "Tehran",
-                       "answers" :
-                        ["Delhi", 
-                         "Tehran", 
-                         "Istanbul"]
-                      }, 
-
-                      {"question" : "What is the capital of Qatar?", 
-                       "correctAnswer" : "Doha",
-                       "answers" :
-                        ["Kuwait", 
-                        "Jerusalem", 
-                        "Doha"]
-                      }, 
-
-                      {"question" : "What is the capital of Oman?", 
-                       "correctAnswer" : "Muscat",
-                       "answers"  :
-                        ["Muscat", 
-                        "Dubai", 
-                        "Manama"]
-                      } 
-          ],
-          clue: {"content" : "What is one plus one", "answer" : "two"},
-          statusComplete: false
-        } 
-  ],
-  finalChallenge: "Game"
-}; 
-
 var Answer = React.createClass({
-  getInitialState: function(){
-    return null; 
+  logCheck: function () {
+    if(this.refs.radioInput.getDOMNode().checked)
+      this.props.passAns(this.props.atext);
   },
   render: function() {
     return <div>
-            <input type="radio" name={this.props.qtext} /> {this.props.atext}  
+            <input type="radio" name={this.props.qtext} ref="radioInput" onChange={this.logCheck}/> {this.props.atext}  
            </div>;
   }
 });
 
 var Question = React.createClass({
+
+  logAnswer: function (answer) {
+    this.props.solution(this.props.qtext, answer);     
+  },
+
   render: function () {
     var answers = this.props.answers.map(function(answerText) {
-                                return <Answer atext={answerText}
+                                return <Answer atext = {answerText}
+                                               passAns = {this.logAnswer}
                                                qtext={this.props.qtext} />
                               }.bind(this));
     return <div>
@@ -123,10 +33,46 @@ var Question = React.createClass({
 
 var Quiz = React.createClass({
   getInitialState() {
-    return {submittedData: null, completed: false};
+    //construct a hash k/v pair of question/answer
+    var sols = {};
+    //this.props.quiz.map(function(q){sols[q.qtext]=null;});
+    return {submittedData: null, correct: false, solutions: sols };
   },
 
-  handleSubmit(e, submittedData) {
+  receiveSolutions: function(problem, solution) {
+    //solution is a single k/v pair {q : a}
+    //update the k/v array of the quiz accordingly
+    var s = this.state.solutions;
+    //update
+    s[problem] = solution;
+
+    this.setState({solutions: s }); 
+
+    this.checkAnswers();
+    
+  },
+
+  checkAnswers: function () {
+
+    //TODO do an ajax request here with server
+    
+    //a little hack for now to reset resubmission
+    this.setState({submittedData : null});
+    //constructing the correct answers
+    var corr = {};
+    this.props.quiz.map(function(q){corr[q.qtext]=q.ctext;});
+
+    this.setState({correct: true});
+
+    for (var k in this.state.solutions) {
+      if (this.state.solutions[k] != corr[k]) {
+        this.setState({correct: false});
+      }
+    }
+  
+  },
+
+  handleSubmit: function (e, submittedData) {
     e.preventDefault();
     this.setState({submittedData});
   },
@@ -135,16 +81,16 @@ var Quiz = React.createClass({
     var solution = this.refs.userInput.getDOMNode().value;
     //if solution is correct advance to next stage and next marker
     if (solution === this.props.clueAns) {
-       this.setState({completed: true}) 
        this.setState({submittedData: null}) 
+       this.setState({solutions: {}}) 
        this.props.onComplete();
     }
       
   },
   render: function() {
     var questions = this.props.quiz.map(function(e) {
-                           return <Question qtext={e.qtext} answers={e.atext} />;
-                     }); 
+                           return <Question solution={this.receiveSolutions} qtext={e.qtext} answers={e.atext} />;
+                     }.bind(this)); 
     var quizform = <div>
              <h3>{this.props.loc}</h3>
              <AutoForm onSubmit={this.handleSubmit}>
@@ -152,30 +98,28 @@ var Quiz = React.createClass({
                <input type="submit" value="Submit"/>
              </AutoForm>
           </div>;
-    //TODO solve logic
-    if (this.state.submittedData){
-      //console.log(JSON.stringify(this.state.submittedData, null, 3));
+    if (this.state.submittedData && this.state.correct){
       return <div>
              <h3>{this.props.loc}</h3>
              <div><strong>{this.props.clue}</strong></div>
              <input type="text" ref="userInput" />
              <input type="submit" value="Take me to the next quiz" onClick={this.solveClue}/>
-          </div>;}
-    else
+          </div>;
+    }
+    else {
       return quizform;
+    }
   }
 });
-
 
 //TODO time permitting
 var Monster = React.createClass({
-
   render: function(){
     return null;
   }
-  
 });
 
+//start the adventure
 var Adventure = React.createClass({
   getInitialState: function() {
     return { current: 0 }
@@ -194,22 +138,26 @@ var Adventure = React.createClass({
   
   render: function () {
     var challenge = this.props.challenge[this.state.current];
-    console.log(challenge);
     var loc     = challenge.loc;
     var qa      = challenge.questions;
     var clue    = challenge.clue.content;
     var clueAns = challenge.clue.answer; 
-
+    
+    //TODO improve logic
     var quiz = [{qtext: qa[0].question,
+                 ctext: qa[0].correctAnswer,
                  atext: [qa[0].answers[0], qa[0].answers[1], qa[0].answers[2]]},
                 {qtext: qa[1].question,
+                 ctext: qa[1].correctAnswer,
                  atext: [qa[1].answers[0], qa[1].answers[1], qa[1].answers[2]]},
                 {qtext: qa[2].question,
+                 ctext: qa[2].correctAnswer,
                  atext: [qa[2].answers[0], qa[2].answers[1], qa[2].answers[2]]}];
 
     return <div> 
             <h1>{this.props.name}</h1>
             <Quiz onComplete={this.proceedToNext} loc={loc}  quiz ={quiz} clue={clue} clueAns={clueAns}/> 
+            <GMap loc={loc} markers={[{lat: -34.397, lon: 150.644, title:"1" }, {lat: -34.9, lon: 151, title: "2"}]} />
           </div>
 
   } 
@@ -224,5 +172,11 @@ var CreateAdventure = React.createClass({
 
 });
 
+var initialize = function () {
+  React.render(<Adventure name= {adventure.name} challenge={adventure.challenges} />, document.getElementById("adventure"));
+}
 
-React.render(<Adventure name= {adventure.name} challenge={adventure.challenges} />, document.getElementById("question-form"));
+$(document).ready(function() {
+  var link = 'http://maps.googleapis.com/maps/api/js?libraries=places&callback=initialize';
+  $('body').append("<script src="+link+"></script>");
+}); 

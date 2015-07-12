@@ -1,1 +1,2 @@
-html, body, .row, .col-md-9, #map-canvas {height: 100%;}
+/*html, body, .row, .col-md-9, #map_canvas {height: 100%;}*/
+html, body {height: 100%;}
