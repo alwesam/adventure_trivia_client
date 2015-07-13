@@ -54,18 +54,21 @@ var Quiz = React.createClass({
 
   checkAnswers: function () {
 
-    //TODO do an ajax request here with server
+    //TODO do an ajax request here with server to check answers
     
     //a little hack for now to reset resubmission
     this.setState({submittedData : null});
+
     //constructing the correct answers
     var corr = {};
     this.props.quiz.map(function(q){corr[q.qtext]=q.ctext;});
 
+    //assuming correctness :)
     this.setState({correct: true});
 
-    for (var k in this.state.solutions) {
-      if (this.state.solutions[k] != corr[k]) {
+    for (var k in corr) {
+      if (this.state.solutions[k] === null || //ie doesn't exist or not selected 
+          this.state.solutions[k] != corr[k]) {
         this.setState({correct: false});
       }
     }
@@ -88,6 +91,7 @@ var Quiz = React.createClass({
       
   },
   render: function() {
+
     var questions = this.props.quiz.map(function(e) {
                            return <Question solution={this.receiveSolutions} qtext={e.qtext} answers={e.atext} />;
                      }.bind(this)); 
@@ -98,6 +102,7 @@ var Quiz = React.createClass({
                <input type="submit" value="Submit"/>
              </AutoForm>
           </div>;
+
     if (this.state.submittedData && this.state.correct){
       return <div>
              <h3>{this.props.loc}</h3>
@@ -112,28 +117,54 @@ var Quiz = React.createClass({
   }
 });
 
+var QuizDesc = React.createClass({
+  render: function () {
+    var paragraph = <div> "This is a description and instructions to the adventure"</div>;
+    return paragraph;
+  }
+});
+
 //TODO time permitting
 var Monster = React.createClass({
   render: function(){
-    return null;
+    return <h1>"Arrrgh... prepare for combat"</h1>;
   }
 });
 
 //start the adventure
 var Adventure = React.createClass({
   getInitialState: function() {
-    return { current: 0 }
+    return { current: 0, 
+             showQuestions: false, 
+             resetMap: false, 
+             finalChallenge: false }
   },
 
   componentDidMount: function () {
-    //here do ajax request to get data
+    //TODO here do ajax request to get data
+    //get the data
+    //start the map and pass it the first coordinates
   },
 
   proceedToNext: function() {
-    if (this.state.current < this.props.challenge.length-1)
+    if (this.state.current < this.props.challenge.length-1){
       this.setState({current: this.state.current + 1});
-    else
-      alert("meet the monster");
+      this.setState({showQuestions: false});
+      //reset map
+      this.setState({resetMap: true});
+    }
+    else {
+      console.log("finally>>>>>>>>>>>>>>");
+      this.setState({finalChallenge: true});
+      this.setState({resetMap: true});
+      this.setState({showQuestions: false});
+    }
+  },
+
+  renderQuestions: function() {
+    //TODO review this dirty hack
+    this.setState({resetMap: false});
+    this.setState({showQuestions: true}); 
   },
   
   render: function () {
@@ -143,7 +174,7 @@ var Adventure = React.createClass({
     var clue    = challenge.clue.content;
     var clueAns = challenge.clue.answer; 
     
-    //TODO improve logic
+    //TODO improve logic once data is retrieved from server
     var quiz = [{qtext: qa[0].question,
                  ctext: qa[0].correctAnswer,
                  atext: [qa[0].answers[0], qa[0].answers[1], qa[0].answers[2]]},
@@ -153,23 +184,61 @@ var Adventure = React.createClass({
                 {qtext: qa[2].question,
                  ctext: qa[2].correctAnswer,
                  atext: [qa[2].answers[0], qa[2].answers[1], qa[2].answers[2]]}];
+    
+    var quizForm = <Quiz onComplete={this.proceedToNext} loc={loc}  quiz ={quiz} clue={clue} clueAns={clueAns}/>;
+    var mapForm = <GMap loc={loc} renderQuestions={this.renderQuestions} resetMap={this.state.resetMap} />;
 
-    return <div> 
-            <h1>{this.props.name}</h1>
-            <Quiz onComplete={this.proceedToNext} loc={loc}  quiz ={quiz} clue={clue} clueAns={clueAns}/> 
-            <GMap loc={loc} markers={[{lat: -34.397, lon: 150.644, title:"1" }, {lat: -34.9, lon: 151, title: "2"}]} />
-          </div>
+    var monsterForm = <Monster />;
+    var quizDescForm = <QuizDesc />;
+
+    console.log("showing questions is: "+this.state.showQuestions);
+
+    //here a giant if-else statement with showQuestions
+    if (this.state.showQuestions) 
+      return <div><h1>{this.props.name}</h1>
+              <div className="row">
+                <div className="col-md-3">{quizForm}</div>
+                <div className="col-md-9">{mapForm}</div>
+              </div>
+            </div>;
+    else if (this.state.finalChallenge)
+      return <div><Monster /></div>;
+    else 
+      return <div><h1>{this.props.name}</h1>
+              <div className="row">
+                <div className="col-md-3">{quizDescForm}</div>
+                <div className="col-md-9">{mapForm}</div>
+              </div>
+            </div>;
 
   } 
 });
 
 //TODO
 var CreateAdventure = React.createClass({
-  
   render: function () {
     return null;
   }
+});
 
+var ChooseAdventure = React.createClass({
+  
+  render: function () {
+    return null;   
+  }
+
+});
+
+//Here is the landing page
+var HomePage = React.createClass({
+  render: function () {
+    var homePage = <div>
+                    <h1>Great Adventure</h1>
+                    <h3>Create an Adventure</h3>
+                    <h3>Play an Adventure</h3>
+                   </div>;
+    return {homePage};
+  }
 });
 
 var initialize = function () {

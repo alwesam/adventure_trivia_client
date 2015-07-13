@@ -1,43 +1,149 @@
 var Marker = React.createClass({
 
-  addMarker: function () {
+  addMarker: function (place) {
+      var lat = place.geometry.location.lat();  
+      var lon = place.geometry.location.lng(); 
 
-      //console.log("decode this location: "+this.props.loc);
-      console.log("I'm marking");
-
+      //create a new marker object to be placed on map
       var marker = new google.maps.Marker({
         //I'm getting the map from GMap
               map: this.props.map,
-              position: new google.maps.LatLng(this.props.lat, this.props.lon),
-              title: this.props.title 
+              //position: new google.maps.LatLng(this.props.lat, this.props.lon),
+              position: place.geometry.location,
+              title: this.props.loc 
+      });
+
+      marker.infoBox = new google.maps.InfoWindow({
+        content: "marker added successfully" 
       });
 
       //extend map as markers are added
-      //this.props.extendMap(this.props.lat, this.props.lon);
-
-      console.log("This is the marker: "+marker);
+      this.props.extendMap(this.props.bounds, lat, lon);
 
       google.maps.event.addListener(marker,'click',function() {          
+        //bug: have to click twice to make disappear
+        //TODO fix bug
           marker.setVisible(false);
-          this.gotoLocation();
+          //marker.setClickable(false);
+          this.gotoLocation(marker);
       }.bind(this)); 
 
       return marker;
   },
+
+  decodeLoc: function () {
+    //get the place
+    var address = this.props.loc; 
+    var service = new google.maps.places.PlacesService(this.props.map);        
+    var request = {query: address};
+    //make an async call to decode the address, after which a
+    //callback functin is make to add the marker
+    service.textSearch(request, function (results, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+            this.addMarker(results[0]);
+        }
+    }.bind(this)); 
+  
+  },
    
   //this function is called when location is clicked
-  gotoLocation: function () {
-    console.log("marker clicked");
-    //streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
+  gotoLocation: function (marker) {
+    //bug: have to click twice to make disappear
+    //TODO fix bug
+    //marker.setVisible(false);
+    //marker.setClickable(false);
+    //TODO hard code for now
+    this.props.map.setZoom(15);
+    this.props.map.panTo(marker.getPosition());
+
+    //make max radius a state
+    streetViewMaxDistance = 100;          
+    //make point a state
+    var point = marker.getPosition();
+    var streetViewService = new google.maps.StreetViewService();
+    //TODO make panorama a state or move to map
+    //var panorama = this.props.map.getStreetView(); 
+    //setup a local variable
+    var panorama = this.props.panorama;
+    
+    var safety = 0;
+    
+    var that = this;
+    var getPanorama = function (streetViewPanoramaData, status) {
+
+        //TODO fix and finish
+        var drawLine = function(op,p) {
+          //connect the two lines 
+          var line = new google.maps.Polyline({
+            path: [op, p],
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 10,
+            map: that.props.map
+          });
+        };
+      
+        if (status === google.maps.StreetViewStatus.OK) {
+
+          //TODO fix
+          var oldPoint = point;
+          point = streetViewPanoramaData.location.latLng;
+          var _GREEN = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+
+          var target = new google.maps.Marker({
+              position: streetViewPanoramaData.location.latLng,
+              map: this.props.map,
+              title: streetViewPanoramaData.location.description,
+              icon: _GREEN
+          });
+          
+          drawLine(marker.getPosition(), target.getPosition());
+
+          //from google maps api docs: Returns the heading from one LatLng to another LatLng.
+          //Headings are expressed in degrees clockwise from North within the range [-180,180).
+          //TODO bug with heading computation
+          //var heading = google.maps.geometry.spherical.computeHeading(point, oldPoint);            
+          panorama.setPano(streetViewPanoramaData.location.pano);
+          panorama.setPosition(point);
+          panorama.setPov({
+              heading: 0,
+              zoom: 1,
+              pitch: 0
+          });
+          panorama.setVisible(true);
+
+          google.maps.event.addListener(target, 'click', function() {
+              that.props.renderQuestions();
+              //panorama.setVisible(false);
+          });
+
+        } else { 
+
+          if (safety < 5) {
+            safety += 1;
+            console.log("trying: "+safety);
+            streetViewMaxDistance = streetViewMaxDistance*2;
+
+            streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
+          } else {
+            console.log("sorry")
+          }
+          
+        }
+
+    }.bind(this);
+
+    streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
+    
   },
 
-  getPanorama: function () {
     //TODO from here call the QUIZ 
-  },
 
   render: function () {
-    console.log("Marker here");
-    this.addMarker();
+
+    //first step is to decode the location
+    this.decodeLoc();
+    //return null since not creating new html elements
     return null;
   }
 
@@ -46,33 +152,36 @@ var Marker = React.createClass({
 var GMap = React.createClass({
  
   getInitialState: function () {
-    console.log("initialstate");
-    return {map: null};
+    return {map: null, mapBounds: null, panorama: null};
   },
    
   componentDidMount: function () {
 
     this.setState({map: this.createMap()}); 
-    //make a request to geocode places
-    //this.setState({marker: this.addMarker()}); 
+    this.setState({mapBounds: this.setMapBounds()});
   
   },
 
-  mapClick: function () {
-    console.log("map clicked"); 
+  setMapBounds: function () {
+    return new google.maps.LatLngBounds();
+  },
+
+  setPanoramView: function(bool) {
+    this.state.panorama.setVisible(bool);
   },
 
   createMap: function () {
-    console.log("creating map");
+    
     var mapOptions = {
-          center: new google.maps.LatLng(-34.397, 150.644),
-          zoom: 8
+          //center: new google.maps.LatLng(41.9, 12.5),
+          //zoom: 4
         };
 
-    //resize map as window grow
+    //create map object 
     var map = new google.maps.Map(this.refs.map_canvas.getDOMNode(), mapOptions);
 
-    google.maps.event.addListener(map, 'click', this.mapClick);
+    //set panorama
+    this.setState({panorama: map.getStreetView()});
 
     /**
      * The following code to keep map centered when reizing window was taken from
@@ -96,64 +205,44 @@ var GMap = React.createClass({
   
   },
 
-  addMarker: function () {
+  resizeMap: function (bounds, lat, lon) {
+    if(lat !== undefined && lon !== undefined)
+	    bounds.extend(new google.maps.LatLng(lat, lon));
 
-      //console.log("decode this location: "+this.props.loc);
-      console.log("I'm marking");
+    var map = this.state.map;
+	  map.fitBounds(bounds);
+	  map.setCenter(bounds.getCenter());
 
-      var marker = new google.maps.Marker({
-        //I'm getting the map from GMap
-              map: this.state.map,
-              position: new google.maps.LatLng(-34.397, 150.644),
-              title: "test" 
-      });
+    if (map.getZoom() > 8)
+      map.setZoom(8);
 
-      //this.props.extendMap(this.props.lat, this.props.lon);
-
-      google.maps.event.addListener(marker,'click',function() {          
-          //marker.setVisible(false);
-          this.gotoLocation();
-      }.bind(this)); 
-
-      return marker;
-  },
-   
-  //this function is called when location is clicked
-  gotoLocation: function () {
-    console.log("marker clicked");
-    //streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
-  },
-
-  getPanorama: function () {
-    //TODO from here call the QUIZ 
-  },
-
-  resizeMap: function () {
-     //TODO 
-     console.log("extending map");
-  },
-
-  getMap: function () {
-    return this.set.map;
+    this.setState({map: map});
   },
 
   render: function () {
-    console.log("rendering map");
-    console.log("Map is: " +this.state.map);
     
     //I'm having a list of markers and I'm passing them the lat and lon and the
     //map state
     
     var markers;
     if(this.state.map) {
-      markers = this.props.markers.map(function(e){
-                    return <Marker map={this.state.map} title={e.title} lat={e.lat} lon={e.lon} /> }.bind(this));
+
+      if (this.props.resetMap)
+        this.setPanoramView(false);
+
+      markers = <Marker loc={this.props.loc} 
+                        renderQuestions = {this.props.renderQuestions}
+                        map={this.state.map} 
+                        panorama={this.state.panorama} 
+                        resetMap={this.props.resetMap} 
+                        extendMap={this.resizeMap} 
+                        bounds={this.state.mapBounds} />;
     } else {
       markers = null;
     }
 
     //I'm just puting markers there in order to have render on the map
-    var style = {height: "500px", width: "500px"};
+    var style = {height: "500px", width: "800px"};
     return <div style={style} ref="map_canvas">{markers}</div>;
   }
 
