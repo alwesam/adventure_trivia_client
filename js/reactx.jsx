@@ -59,6 +59,7 @@ var Quiz = React.createClass({
     //a little hack for now to reset resubmission
     this.setState({submittedData : null});
 
+    /***DOWN here willl be done on server side****/
     //constructing the correct answers
     var corr = {};
     this.props.quiz.map(function(q){corr[q.qtext]=q.ctext;});
@@ -124,15 +125,138 @@ var QuizDesc = React.createClass({
   }
 });
 
-//TODO time permitting
 var Monster = React.createClass({
+
+  getInitialState: function () {
+    return {won: false, loss: false};
+  },
+
+  gameWon: function () {
+    this.setState({won: true});
+  },
+
+  gameLost: function () {
+    this.setState({loss: true});
+  },
+
   render: function(){
-    return <h1>"Arrrgh... prepare for combat"</h1>;
+    var monster = <h1>"Arrrgh... prepare for combat"</h1>;
+    //Temp
+    var link = <h2><a href="#" onClick={this.gameWon}>OK you won</a></h2>;
+    ////
+    var finalPage = <FinalPage />;
+    var finalPageLost = <FinalPageLost />;
+    if (this.state.won)
+      return <div>{finalPage}</div>;
+    else if (this.state.loss)
+      return <div>{finalPageLost}</div>;
+    else
+      return <div>{monster} {link}</div>; 
+  }
+
+});
+
+
+var Review = React.createClass({
+  getInitialState: function () {
+    return {rating: 0};
+  },
+    
+  //ask an expert in react
+  rate: function () {
+    this.setState({rating: this.refs.starInput.getDOMNode().value});
+   // this.setState({ratingText: this.state.rating+" stars"});
+    this.props.text(this.state.rating);
+  },
+
+  render: function () {
+    return  <input type="radio" name="rating" value={this.props.value} ref="starInput" onChange={this.rate}/>
+  }
+
+});
+
+
+var FinalPage = React.createClass({
+
+  getInitialState: function () {
+    return {rating: 0, ratingText: "Choose a rating"};
+  },
+
+  //ask an expert in react
+  //it's retarded but couldn't find an other way that doesn't involve webpack or
+  //browsify (till now)
+  //make an ajax request to send rating to server
+  rate1: function () {
+    this.setState({rating: this.refs.star1Input.getDOMNode().value});
+    this.setState({ratingText: this.refs.star1Input.getDOMNode().value+" stars"});
+  },
+  rate2: function () {
+    this.setState({rating: this.refs.star2Input.getDOMNode().value});
+    this.setState({ratingText: this.refs.star2Input.getDOMNode().value+" stars"});
+  },
+  rate3: function () {
+    this.setState({rating: this.refs.star3Input.getDOMNode().value});
+    this.setState({ratingText: this.refs.star3Input.getDOMNode().value+" stars"});
+  },
+  rate4: function () {
+    this.setState({rating: this.refs.star4Input.getDOMNode().value});
+    this.setState({ratingText: this.refs.star4Input.getDOMNode().value+" stars"});
+  },
+  rate5: function () {
+    this.setState({rating: this.refs.star5Input.getDOMNode().value});
+    this.setState({ratingText: this.refs.star5Input.getDOMNode().value+" stars"});
+  },
+
+  postReview: function(value) {
+    //make a post request to post review 
+  }, 
+
+  render: function(){
+
+    var image = <div><img src={'img/wisely.jpg'} /></div>;
+
+    //This is my proudest achievement :-P
+    var stars = <span className="star-rating">
+                   <input type="radio" name="rating" value="1" ref="star1Input" onChange={this.rate1}/><i></i>
+                   <input type="radio" name="rating" value="2" ref="star2Input" onChange={this.rate2}/><i></i>
+                   <input type="radio" name="rating" value="3" ref="star3Input" onChange={this.rate3}/><i></i>
+                   <input type="radio" name="rating" value="4" ref="star4Input" onChange={this.rate4}/><i></i>
+                   <input type="radio" name="rating" value="5" ref="star5Input" onChange={this.rate5}/><i></i>
+                 </span>;
+
+    /**didn't work :-(
+    var stars = ['','','','',''].map(function (s, i) {
+        return <span key={i} className="star-rating">
+                 <Review text={this.showRating} value={i+1} /><i></i>; 
+               </span>;
+    });*/ 
+
+    var inviteFriends = <h4><a href="#">Invite your friends</a></h4>;
+
+    return <div>
+            <h1>Congratulations!</h1>
+            {image}
+            <div>{stars}</div>
+            <div><strong>{this.state.ratingText}</strong></div>
+            {inviteFriends}
+           </div>; 
+  }
+});
+
+var FinalPageLost = React.createClass({
+
+  render: function(){
+    var image = <div><img src={'img/poorly.jpg'} /></div>;
+
+    return (
+      <div>
+      {image}
+      </div>); 
   }
 });
 
 //start the adventure
-var Adventure = React.createClass({
+var PlayAdventure = React.createClass({
   getInitialState: function() {
     return { current: 0, 
              showQuestions: false, 
@@ -154,7 +278,6 @@ var Adventure = React.createClass({
       this.setState({resetMap: true});
     }
     else {
-      console.log("finally>>>>>>>>>>>>>>");
       this.setState({finalChallenge: true});
       this.setState({resetMap: true});
       this.setState({showQuestions: false});
@@ -172,16 +295,17 @@ var Adventure = React.createClass({
     var loc     = challenge.loc;
     var qa      = challenge.questions;
     var clue    = challenge.clue.content;
+    var clueHint= challenge.clue.hint;
     var clueAns = challenge.clue.answer; 
     
     //TODO improve logic once data is retrieved from server
-    var quiz = [{qtext: qa[0].question,
+    var quiz = [{qtext: qa[0].content,
                  ctext: qa[0].correctAnswer,
                  atext: [qa[0].answers[0], qa[0].answers[1], qa[0].answers[2]]},
-                {qtext: qa[1].question,
+                {qtext: qa[1].content,
                  ctext: qa[1].correctAnswer,
                  atext: [qa[1].answers[0], qa[1].answers[1], qa[1].answers[2]]},
-                {qtext: qa[2].question,
+                {qtext: qa[2].content,
                  ctext: qa[2].correctAnswer,
                  atext: [qa[2].answers[0], qa[2].answers[1], qa[2].answers[2]]}];
     
@@ -191,7 +315,7 @@ var Adventure = React.createClass({
     var monsterForm = <Monster />;
     var quizDescForm = <QuizDesc />;
 
-    console.log("showing questions is: "+this.state.showQuestions);
+    //console.log("showing questions is: "+this.state.showQuestions);
 
     //here a giant if-else statement with showQuestions
     if (this.state.showQuestions) 
@@ -214,35 +338,110 @@ var Adventure = React.createClass({
   } 
 });
 
-//TODO
-var CreateAdventure = React.createClass({
+var Adventure = React.createClass({
+
+  getInitialState: function () {
+    return {description: "",
+            play       : false,
+            challenge       : [],
+            detailsFetched: false}
+  },
+  fetchDetails: function () {
+    //TODO fetch details from JSON later 
+    this.setState({description: "Hello Indy"});
+    this.setState({detailsFetched: true}) 
+    this.setState({challenge: adventure.challenges}) 
+  },
+
+  startAdventure: function () {
+    this.setState({play: true});
+  },
+
   render: function () {
-    return null;
+    if (this.state.play) {
+      //TODO finish
+      return <PlayAdventure name= {this.props.name} challenge={this.state.challenge} />
+    }
+    else if (this.state.detailsFetched) {
+      return <div>
+               <h3>{this.props.name}</h3>
+               <p>{this.state.description}</p>
+               <button href="#" onClick={this.startAdventure}>Play</button>
+             </div>;
+    }
+    else {
+      return <div>
+              <a href="#" onClick={this.fetchDetails}> {this.props.name}</a>
+             </div>;
+    }
   }
+
 });
 
-var ChooseAdventure = React.createClass({
-  
-  render: function () {
-    return null;   
-  }
+//TODO
+var Adventures = React.createClass({
+  getInitialState: function () {
+    return {adventures: [], showSpinner: true}
+  },
 
+  componentDidMount: function () {
+    //TODO make an ajax request
+    //for now just do the following
+    var data = [{"name": "Find the Holy Grail", "description": "Indy!!!"}];
+    this.setState({adventures: data});
+    this.setState({showSpinner: false});
+  },
+
+  render: function () {
+    
+    var adventures = this.state.adventures.map(function(a) {
+      return <Adventure name={a.name} />; //don't forget the id
+    });
+    var spinnerDisplay = this.state.showSpinner ? "block" : "none";
+    var spinnerStyle   = {display: spinnerDisplay};
+    return <div className="text-center">
+             <div style={spinnerStyle}>Loading...</div>
+             {adventures}
+           </div>;
+  }
 });
 
 //Here is the landing page
 var HomePage = React.createClass({
+  getInitialState: function () {
+    return {createAdventure: false, playAdventure: false}
+  },
+
+  play: function () {
+    this.setState({playAdventure: true});
+  },
+
+  create: function () {
+    this.setState({createAdventure: true});
+  },
+
   render: function () {
-    var homePage = <div>
-                    <h1>Great Adventure</h1>
-                    <h3>Create an Adventure</h3>
-                    <h3>Play an Adventure</h3>
+
+    var homePage = <div className="text-center container">
+                     <h1>Welcome to Adventure Trivia</h1>
+                     <h3><a href="#" onClick={this.create}>Create an Adventure</a></h3>
+                     <h3><a href="#" onClick={this.play}>Play an Adventure</a></h3>
                    </div>;
-    return {homePage};
+
+    if (this.state.createAdventure)
+      return <div className="container"><CreateAdventure /></div>;
+    else if (this.state.playAdventure)
+      return <div className="container"><Adventures /></div>;
+    else
+      return homePage;
+
   }
 });
 
 var initialize = function () {
-  React.render(<Adventure name= {adventure.name} challenge={adventure.challenges} />, document.getElementById("adventure"));
+  //for now
+  //React.render(<PlayAdventure name= {adventure.name} challenge={adventure.challenges} />, document.getElementById("adventure"));
+  React.render(<HomePage />, document.getElementById("adventure"));
 }
 
 $(document).ready(function() {

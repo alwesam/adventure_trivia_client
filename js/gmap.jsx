@@ -31,6 +31,8 @@ var Marker = React.createClass({
       return marker;
   },
 
+  //TODO study the possiblity of having lat/lng decoded in rails using geocoder
+  //gem
   decodeLoc: function () {
     //get the place
     var address = this.props.loc; 
