@@ -1,17 +1,32 @@
 var Marker = React.createClass({
 
+  getInitialState: function () {
+  
+    return {currentMarker: null, gems: [], stopAdding: false};
+
+  },
+
+  componentDidUpdate: function () {
+    console.log("hello there, I'm updated");
+  },
+
   addMarker: function (place) {
+
       var lat = place.geometry.location.lat();  
       var lon = place.geometry.location.lng(); 
 
+      //console.log("the state of current marker "+this.state.currentMarker);
+
       //create a new marker object to be placed on map
       var marker = new google.maps.Marker({
-        //I'm getting the map from GMap
+        //I'm getting the map from Map
               map: this.props.map,
               //position: new google.maps.LatLng(this.props.lat, this.props.lon),
               position: place.geometry.location,
               title: this.props.loc 
       });
+
+      console.log("marker added"); 
 
       marker.infoBox = new google.maps.InfoWindow({
         content: "marker added successfully" 
@@ -20,20 +35,24 @@ var Marker = React.createClass({
       //extend map as markers are added
       this.props.extendMap(this.props.bounds, lat, lon);
 
+      this.setState({currentMarker: marker});
+
       google.maps.event.addListener(marker,'click',function() {          
-        //bug: have to click twice to make disappear
-        //TODO fix bug
+          var bool = (this.state.currentMarker === marker);
+          console.log("current marker at first click "+bool);
           marker.setVisible(false);
+          //console.log("current marker is "+this.state.currentMarker.getVisible());
           //marker.setClickable(false);
-          this.gotoLocation(marker);
+          this.gotoLocation();
       }.bind(this)); 
 
       return marker;
+
   },
 
-  //TODO study the possiblity of having lat/lng decoded in rails using geocoder
-  //gem
+  //TODO do in the server
   decodeLoc: function () {
+    //this.setState({stopAdding: true});
     //get the place
     var address = this.props.loc; 
     var service = new google.maps.places.PlacesService(this.props.map);        
@@ -42,29 +61,27 @@ var Marker = React.createClass({
     //callback functin is make to add the marker
     service.textSearch(request, function (results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-            this.addMarker(results[0]);
+          if (this.state.currentMarker === null || 
+              this.state.currentMarker.getTitle() !== this.props.place)
+              this.setState({currentMarker: this.addMarker(results[0])});
         }
     }.bind(this)); 
   
   },
    
   //this function is called when location is clicked
-  gotoLocation: function (marker) {
-    //bug: have to click twice to make disappear
-    //TODO fix bug
-    //marker.setVisible(false);
-    //marker.setClickable(false);
+  gotoLocation: function () {
+    
+    var marker = this.state.currentMarker;
+    var point = marker.getPosition();
     //TODO hard code for now
     this.props.map.setZoom(15);
     this.props.map.panTo(marker.getPosition());
 
-    //make max radius a state
-    streetViewMaxDistance = 100;          
+    //TODO make max radius a state
+    var streetViewMaxDistance = 100;          
     //make point a state
-    var point = marker.getPosition();
     var streetViewService = new google.maps.StreetViewService();
-    //TODO make panorama a state or move to map
-    //var panorama = this.props.map.getStreetView(); 
     //setup a local variable
     var panorama = this.props.panorama;
     
@@ -90,10 +107,17 @@ var Marker = React.createClass({
           //TODO fix
           var oldPoint = point;
           point = streetViewPanoramaData.location.latLng;
+
+          //TODO this is a hack for now
+          var newLat = point.lat()+0.0002;
+          var newLng = point.lng();
+
           var _GREEN = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+          var _INDIANA = 'img/indiana.jpg';
 
           var target = new google.maps.Marker({
-              position: streetViewPanoramaData.location.latLng,
+              position: new google.maps.LatLng(newLat, newLng),
+              //position: point,
               map: this.props.map,
               title: streetViewPanoramaData.location.description,
               icon: _GREEN
@@ -116,6 +140,7 @@ var Marker = React.createClass({
 
           google.maps.event.addListener(target, 'click', function() {
               that.props.renderQuestions();
+              target.setVisible(false);
               //panorama.setVisible(false);
           });
 
@@ -139,26 +164,30 @@ var Marker = React.createClass({
     
   },
 
-    //TODO from here call the QUIZ 
-
   render: function () {
-
+    
+    console.log("Hello, I'm rendered");
     //first step is to decode the location
-    this.decodeLoc();
+    if(this.state.currentMarker === null || 
+       this.state.currentMarker.getTitle() !== this.props.loc){ 
+        this.decodeLoc(); //this runs asynchronously
+    }
+
     //return null since not creating new html elements
     return null;
   }
 
 }); 
 
-var GMap = React.createClass({
+var Map = React.createClass({
  
   getInitialState: function () {
-    return {map: null, mapBounds: null, panorama: null};
+    return {map: null, 
+            mapBounds: null, 
+            panorama: null};
   },
    
   componentDidMount: function () {
-
     this.setState({map: this.createMap()}); 
     this.setState({mapBounds: this.setMapBounds()});
   
@@ -168,7 +197,7 @@ var GMap = React.createClass({
     return new google.maps.LatLngBounds();
   },
 
-  setPanoramView: function(bool) {
+  setPanoramaView: function(bool) {
     this.state.panorama.setVisible(bool);
   },
 
@@ -221,31 +250,53 @@ var GMap = React.createClass({
     this.setState({map: map});
   },
 
+  toggleStreetView: function () {
+    var toggle = this.state.panorama.getVisible();
+    if (toggle == true)
+      this.state.panorama.setVisible(false); 
+    else
+      this.state.panorama.setVisible(true);  
+  },
+
+  resetView: function () {
+    this.state.panorama.setVisible(false);
+  },
+
   render: function () {
     
     //I'm having a list of markers and I'm passing them the lat and lon and the
     //map state
+    if(this.props.resetMap)
+       this.resetView();
     
     var markers;
     if(this.state.map) {
 
-      if (this.props.resetMap)
-        this.setPanoramView(false);
-
-      markers = <Marker loc={this.props.loc} 
+      //
+      markers = <Marker loc={this.props.loc} //or lat, lng if use geocoder in rails 
                         renderQuestions = {this.props.renderQuestions}
                         map={this.state.map} 
+                        sendMarkers={this.sendMarkers}
                         panorama={this.state.panorama} 
-                        resetMap={this.props.resetMap} 
                         extendMap={this.resizeMap} 
                         bounds={this.state.mapBounds} />;
     } else {
+
       markers = null;
+
     }
 
     //I'm just puting markers there in order to have render on the map
     var style = {height: "500px", width: "800px"};
-    return <div style={style} ref="map_canvas">{markers}</div>;
+    var button = <div id="panel" >
+                    <input type="button" value="Toggle Street View" onClick={this.toggleStreetView}/>
+                 </div>;
+    return  <div>
+              {button}
+              <div style={style} ref="map_canvas">
+                {markers}
+              </div>
+            </div>;
   }
 
 });

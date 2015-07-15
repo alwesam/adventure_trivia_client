@@ -81,7 +81,7 @@ var CreateQuestion = React.createClass({
     var answers = ['a','b','c'].map(function (answer, index) {
       return (
         <div key={index}>
-          <MakeAnswers question={this.state.qtext} />
+          <MakeAnswers question={this.state.qtext} index={index}/>
         </div>
       );
     }.bind(this));
@@ -98,11 +98,24 @@ var CreateQuestion = React.createClass({
 var CreateQuiz = React.createClass({
 
   getInitialState: function(){
-    return {numQuestions: 1};
+    return {  numQuestions: 1,
+              loc: "",
+              riddle: {},
+              questions: []
+            };
   },
 
   addQuestion: function () {
     this.setState({numQuestions: this.state.numQuestions+1});
+  },
+
+  constructQuiz: function () {
+    
+    var obj = {"location" : this.props.loc,
+               "riddle": this.state.riddle, 
+               "question": this.state.questions 
+               };
+    this.props.addToAdventure(this.props.index, index);
   },
 
   render: function () {
@@ -133,15 +146,40 @@ var CreateQuiz = React.createClass({
 var CreateAdventure = React.createClass({
   getInitialState: function () {
     return {
-            adventureName: "",
-            adventureLocations: [],
-            data: {}
+              adventureName: "",
+              adventureDescription: "",
+              adventureChallenges: [],
+              finalChallenge: false,
+              jsonError: false
             };
   },
 
+  addAdventureObject: function (index, obj) {
+    var challenge = this.state.adventureChallenges;
+    challenge[index] = obj;
+    this.setState({adventureChallenges: challenge});
+  },
+
+    //TODO use form instead
   onSubmit: function () {
     //TODO make an ajax post request to
     //send data to server
+    var url ="http://localhost:3000"; 
+    var data= {"name": this.state.adventureName,
+               "description": this.state.adventureDescription,
+               "challenges" : this.state.adventureChallenges,
+               "finalChallenge": this.state.finalChallenge
+              }
+
+    $.ajax({
+      type: "POST",
+      url: url,
+      data: data,
+      success: function (data) {
+        console.log(data);
+      }.bind(this)
+    });
+
   },
 
   nameInput: function () {
@@ -150,29 +188,47 @@ var CreateAdventure = React.createClass({
 
   locInput: function () {
     var locString = this.refs.locInput.getDOMNode().value; 
-    this.setState({adventureLocations: locString.trim().split(";") }); 
+    this.setState({adventureChallenges: locString.trim().split(";") }); 
+  },
+
+  checkGame: function () {
+    this.setState({finalChallenge: this.refs.checkGame.getDOMNode().checked});
+  },
+
+  descInput: function () {
+    this.setState({adventureDescription: this.refs.descInput.getDOMNode().value}); 
+    console.log(this.state.adventureDescription);
   },
 
   isReady: function () {
-    return (this.state.adventureName.length > 0); 
+    return (this.state.adventureName.length > 0 &&
+            this.state.adventureDescription.length >0 &&
+            this.state.adventureChallenges.length > 0); 
   },
 
   render: function () {
     var name = <input type="text" placeholder="Enter Name of Adventure" ref="nameInput" onChange={this.nameInput}/>;  
     
-    var locsBox = <input type="text" placeholder="Enter Locations separated by semicolon" ref="locInput" onChange={this.locInput}/>;  
+    var description = <textarea name="description" placeholder="Enter a description" ref="descInput" onChange={this.descInput} />;  
 
-    var quiz = this.state.adventureLocations.map(function (loc) {
-                       return <CreateQuiz loc={loc} />;
+    var locsBox = <textarea name="locations" placeholder="Enter Locations separated by semicolon" ref="locInput" onChange={this.locInput}/>;  
+
+    var quiz = this.state.adventureChallenges.map(function (loc, index) {
+                       return <CreateQuiz loc={loc} index={index} />;
                     });
+    
+    var includeGame = <div><input type="checkbox" ref="checkGame" onChange={this.checkGame}/>
+                           <strong>Include Final Challenge? </strong></div>;  
  
     var submitButton = <input type="submit" value="Create Adventure" disabled={!this.isReady()} />;
 
     return <div>
              <h1 className="text-center">Create your Own Adventure</h1>
              <div>{name}</div>
+             <div>{description}</div>
              <div>{locsBox}</div>
              <div>{quiz}</div>
+             <div>{includeGame}</div>
              <div>{submitButton}</div>
            </div>;   
   }

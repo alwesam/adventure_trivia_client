@@ -94,5 +94,5 @@ var adventure = {
           clue: {"content" : "What is one plus one", "hint" : "do you even read?", "answer" : "two"}
         } 
   ],
-  finalChallenge: "Game"
+  finalChallenge: true
 }; 

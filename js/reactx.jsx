@@ -182,31 +182,11 @@ var FinalPage = React.createClass({
     return {rating: 0, ratingText: "Choose a rating"};
   },
 
-  //ask an expert in react
-  //it's retarded but couldn't find an other way that doesn't involve webpack or
-  //browsify (till now)
-  //make an ajax request to send rating to server
-  rate1: function () {
-    this.setState({rating: this.refs.star1Input.getDOMNode().value});
-    this.setState({ratingText: this.refs.star1Input.getDOMNode().value+" stars"});
+  rate: function (value) {
+    this.setState({rating: value});
+    this.setState({ratingText: value+" stars"});
   },
-  rate2: function () {
-    this.setState({rating: this.refs.star2Input.getDOMNode().value});
-    this.setState({ratingText: this.refs.star2Input.getDOMNode().value+" stars"});
-  },
-  rate3: function () {
-    this.setState({rating: this.refs.star3Input.getDOMNode().value});
-    this.setState({ratingText: this.refs.star3Input.getDOMNode().value+" stars"});
-  },
-  rate4: function () {
-    this.setState({rating: this.refs.star4Input.getDOMNode().value});
-    this.setState({ratingText: this.refs.star4Input.getDOMNode().value+" stars"});
-  },
-  rate5: function () {
-    this.setState({rating: this.refs.star5Input.getDOMNode().value});
-    this.setState({ratingText: this.refs.star5Input.getDOMNode().value+" stars"});
-  },
-
+  
   postReview: function(value) {
     //make a post request to post review 
   }, 
@@ -215,21 +195,14 @@ var FinalPage = React.createClass({
 
     var image = <div><img src={'img/wisely.jpg'} /></div>;
 
-    //This is my proudest achievement :-P
-    var stars = <span className="star-rating">
-                   <input type="radio" name="rating" value="1" ref="star1Input" onChange={this.rate1}/><i></i>
-                   <input type="radio" name="rating" value="2" ref="star2Input" onChange={this.rate2}/><i></i>
-                   <input type="radio" name="rating" value="3" ref="star3Input" onChange={this.rate3}/><i></i>
-                   <input type="radio" name="rating" value="4" ref="star4Input" onChange={this.rate4}/><i></i>
-                   <input type="radio" name="rating" value="5" ref="star5Input" onChange={this.rate5}/><i></i>
+    //TODO fix!!!!!!!!!!!!!1
+    var stars = <span className="star-rating-next">
+                   <input type="radio" name="rating" onChange={this.rate.bind(null,1)}/><i className={this.state.rating >= 1? "star-on":"star-off"}></i>
+                   <input type="radio" name="rating" onChange={this.rate.bind(null,2)}/><i className={this.state.rating >= 2? "star-on":"star-off"}></i>
+                   <input type="radio" name="rating" onChange={this.rate.bind(null,3)}/><i className={this.state.rating >= 3? "star-on":"star-off"}></i>
+                   <input type="radio" name="rating" onChange={this.rate.bind(null,4)}/><i className={this.state.rating >= 4? "star-on":"star-off"}></i>
+                   <input type="radio" name="rating" onChange={this.rate.bind(null,5)}/><i className={this.state.rating >= 5? "star-on":"star-off"}></i>
                  </span>;
-
-    /**didn't work :-(
-    var stars = ['','','','',''].map(function (s, i) {
-        return <span key={i} className="star-rating">
-                 <Review text={this.showRating} value={i+1} /><i></i>; 
-               </span>;
-    });*/ 
 
     var inviteFriends = <h4><a href="#">Invite your friends</a></h4>;
 
@@ -310,7 +283,7 @@ var PlayAdventure = React.createClass({
                  atext: [qa[2].answers[0], qa[2].answers[1], qa[2].answers[2]]}];
     
     var quizForm = <Quiz onComplete={this.proceedToNext} loc={loc}  quiz ={quiz} clue={clue} clueAns={clueAns}/>;
-    var mapForm = <GMap loc={loc} renderQuestions={this.renderQuestions} resetMap={this.state.resetMap} />;
+    var mapForm = <Map loc={loc} renderQuestions={this.renderQuestions} resetMap={this.state.resetMap} />;
 
     var monsterForm = <Monster />;
     var quizDescForm = <QuizDesc />;
@@ -442,6 +415,7 @@ var initialize = function () {
   //for now
   //React.render(<PlayAdventure name= {adventure.name} challenge={adventure.challenges} />, document.getElementById("adventure"));
   React.render(<HomePage />, document.getElementById("adventure"));
+  //React.render(<FinalPage />, document.getElementById("adventure"));
 }
 
 $(document).ready(function() {
