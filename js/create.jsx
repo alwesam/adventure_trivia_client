@@ -6,6 +6,10 @@ var MakeRiddle = React.createClass({
 
   riddleInput: function () {
     this.setState({rtext: this.refs.riddleInput.getDOMNode().value}); 
+    //pass the riddle object 
+    this.props.makeRiddle({content: this.state.rtext, 
+                           hint: this.state.htext, 
+                           solution: this.state.ltext});
   },
 
   hintInput: function () {
@@ -25,6 +29,7 @@ var MakeRiddle = React.createClass({
 
 });
 
+////////////////////////////////
 var MakeAnswers = React.createClass({
 
   getInitialState: function(){
@@ -33,12 +38,12 @@ var MakeAnswers = React.createClass({
 
   answerInput: function () {
     this.setState({atext: this.refs.answerInput.getDOMNode().value}); 
+    //pass the answer
+    this.props.passAnswers(this.props.index, this.state.correct, this.state.atext);
   },
 
   checkSelect: function () {
-    if (this.refs.userSelect.getDOMNode().checked) {
-      this.setState({correct: true}); 
-    }
+    this.setState({correct: this.refs.userSelect.getDOMNode().checked}); 
   },
 
   render: function () {
@@ -52,11 +57,28 @@ var MakeAnswers = React.createClass({
 var CreateQuestion = React.createClass({
   getInitialState: function(){
     return {qtext: "",
+            answer: "",
+            choices: [],
             answerType: null};
+  },
+
+  addToQuestion: function (index, correct, choice) {
+
+    var choices = this.state.choices;
+    choices[index] = choice;
+    this.setState({choices: choices});
+
+    if (correct)
+      this.setState({answer: choice});
+
   },
 
   questionInput: function () {
     this.setState({qtext: this.refs.questionInput.getDOMNode().value}); 
+    //pass the question to Quiz
+    this.props.addToQuiz({content: this.state.qtext,
+                          answer: this.state.answer, 
+                          answers: this.state.choices});
   },
     
   //TODO
@@ -70,18 +92,14 @@ var CreateQuestion = React.createClass({
                            ref="questionInput" 
                            onChange={this.questionInput}/>;
 
-    var answerType = <select><option value="multiple">Multiple Choice</option></select>
+    //TODO
+    //var answerType = <select><option value="multiple">Multiple Choice</option></select>
+    var answerType;
     //3 possible answers.... for now
-    //TODO fix that
-    //also add ability to select type of answering
-    //1) mutliple choice (radio)
-    //2) true or false 
-    //3) text input 
-    //do If else statement
-    var answers = ['a','b','c'].map(function (answer, index) {
+    var answers = ['','',''].map(function (answer, index) {
       return (
         <div key={index}>
-          <MakeAnswers question={this.state.qtext} index={index}/>
+          <MakeAnswers question={this.state.qtext} index={index} passAnswers={this.addToQuestion} />
         </div>
       );
     }.bind(this));
@@ -90,11 +108,11 @@ var CreateQuestion = React.createClass({
                 <div>{question} {answerType}</div>
                 {answers}
            </div>; 
-  
   }
 
 });
 
+//////////////////////////
 var CreateQuiz = React.createClass({
 
   getInitialState: function(){
@@ -109,31 +127,42 @@ var CreateQuiz = React.createClass({
     this.setState({numQuestions: this.state.numQuestions+1});
   },
 
-  constructQuiz: function () {
+    //this function gets called from Riddle component
+  buildRiddle: function (obj) {
+
+    this.setState({riddle: obj});
     
-    var obj = {"location" : this.props.loc,
-               "riddle": this.state.riddle, 
-               "question": this.state.questions 
-               };
-    this.props.addToAdventure(this.props.index, index);
+    //pass the Quiz or challenge or stage to adventure
+    this.props.addToAdventure(this.props.index,
+                              {address : this.props.loc,
+                               riddle: this.state.riddle, 
+                               questions: this.state.questions 
+                              });
+  },
+
+    //this function gets called from Question component
+  addToQuiz: function (index, obj) {
+    var questions = this.state.questions;
+    questions[index] = obj;
+    this.setState({questions: questions});
   },
 
   render: function () {
-   
     var arr=[]; 
     for(var i=0; i<this.state.numQuestions; i++)
       arr.push('');
 
+    console.log("array of questions length "+arr.length);
+
     var questions = arr.map(function (question, index){
       return (
           <div key={index}>
-            <CreateQuestion />
+            <CreateQuestion addToQuiz={this.addToQuiz} />
           </div>
         ); 
     }.bind(this));
-
-    var riddle = <div><MakeRiddle /></div>;
-
+    var riddle = <div><MakeRiddle makeRiddle={this.buildRiddle} /></div>;
+    var riddle;
     return <div><h3>Questions about {this.props.loc}</h3>
                 {questions}
                 {riddle}
@@ -143,38 +172,62 @@ var CreateQuiz = React.createClass({
 
 });
 
+//////////////////////////////
 var CreateAdventure = React.createClass({
   getInitialState: function () {
     return {
-              adventureName: "",
+              adventureTitle: "",
               adventureDescription: "",
               adventureChallenges: [],
-              finalChallenge: false,
+              includeFinal: false,
               jsonError: false
             };
   },
 
   addAdventureObject: function (index, obj) {
+    console.log("object to be plastered ", obj);
+    console.log("adventure challenges length "+this.state.adventureChallenges.length);
     var challenge = this.state.adventureChallenges;
     challenge[index] = obj;
+    //Test
     this.setState({adventureChallenges: challenge});
   },
 
     //TODO use form instead
   onSubmit: function () {
-    //TODO make an ajax post request to
+    
     //send data to server
-    var url ="http://localhost:3000"; 
-    var data= {"name": this.state.adventureName,
-               "description": this.state.adventureDescription,
-               "challenges" : this.state.adventureChallenges,
-               "finalChallenge": this.state.finalChallenge
-              }
+    var data = {title: this.state.adventureTitle,
+               description: this.state.adventureDescription,
+               challenges : this.state.adventureChallenges,
+               include_final: this.state.includeFinal
+              } 
 
+    //check data
+    //console.log(data);
+    //console.log(JSON.stringify(data));
+
+    //use to test data
+    var challenges = [];
+    challenges [0] = {address: "Rome, Italy", 
+                    riddle: {content: "hi", hint: "hello", solution: "thanks"}, 
+                    questions: [{content : "Q1", answer: "A1", answers: [{content: "hello"}]}]};
+    challenges [1] = {address: "Naples, Italy", 
+                    riddle: {content: "hi", hint: "hello", solution: "thanks"}, 
+                    questions: [{content : "Q3", answer: "A3", answers: [{content: "hello"}]}]};
+
+    var datatest = {adventure : {"title": "Indy",
+               description: "Description",
+               challenges : challenges,
+               include_final: true 
+              }} 
+
+    var url ="http://localhost:3000/adventures"; 
+    
     $.ajax({
       type: "POST",
       url: url,
-      data: data,
+      data: datatest,
       success: function (data) {
         console.log(data);
       }.bind(this)
@@ -183,7 +236,7 @@ var CreateAdventure = React.createClass({
   },
 
   nameInput: function () {
-    this.setState({adventureName: this.refs.nameInput.getDOMNode().value}); 
+    this.setState({adventureTitle: this.refs.nameInput.getDOMNode().value}); 
   },
 
   locInput: function () {
@@ -197,11 +250,11 @@ var CreateAdventure = React.createClass({
 
   descInput: function () {
     this.setState({adventureDescription: this.refs.descInput.getDOMNode().value}); 
-    console.log(this.state.adventureDescription);
+    //console.log(this.state.adventureDescription);
   },
 
   isReady: function () {
-    return (this.state.adventureName.length > 0 &&
+    return (this.state.adventureTitle.length > 0 &&
             this.state.adventureDescription.length >0 &&
             this.state.adventureChallenges.length > 0); 
   },
@@ -214,13 +267,14 @@ var CreateAdventure = React.createClass({
     var locsBox = <textarea name="locations" placeholder="Enter Locations separated by semicolon" ref="locInput" onChange={this.locInput}/>;  
 
     var quiz = this.state.adventureChallenges.map(function (loc, index) {
-                       return <CreateQuiz loc={loc} index={index} />;
-                    });
+                       
+                       return <CreateQuiz loc={loc} index={index} addToAdventure={this.addAdventureObject} />;
+                    }.bind(this));
     
     var includeGame = <div><input type="checkbox" ref="checkGame" onChange={this.checkGame}/>
                            <strong>Include Final Challenge? </strong></div>;  
  
-    var submitButton = <input type="submit" value="Create Adventure" disabled={!this.isReady()} />;
+    var submitButton = <input type="submit" value="Create Adventure" onClick={this.onSubmit} disabled={!this.isReady()} />;
 
     return <div>
              <h1 className="text-center">Create your Own Adventure</h1>

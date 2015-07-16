@@ -1,329 +1,28 @@
-var Answer = React.createClass({
-  logCheck: function () {
-    if(this.refs.radioInput.getDOMNode().checked)
-      this.props.passAns(this.props.atext);
-  },
-  render: function() {
-    return <div>
-            <input type="radio" name={this.props.qtext} ref="radioInput" onChange={this.logCheck}/> {this.props.atext}  
-           </div>;
-  }
-});
-
-var Question = React.createClass({
-
-  logAnswer: function (answer) {
-    this.props.solution(this.props.qtext, answer);     
-  },
-
-  render: function () {
-    var answers = this.props.answers.map(function(answerText) {
-                                return <Answer atext = {answerText}
-                                               passAns = {this.logAnswer}
-                                               qtext={this.props.qtext} />
-                              }.bind(this));
-    return <div>
-            {this.props.qtext}
-            <div>
-            {answers}
-            </div>
-           </div>;
-  }
-});
-
-var Quiz = React.createClass({
-  getInitialState() {
-    //construct a hash k/v pair of question/answer
-    var sols = {};
-    //this.props.quiz.map(function(q){sols[q.qtext]=null;});
-    return {submittedData: null, correct: false, solutions: sols };
-  },
-
-  receiveSolutions: function(problem, solution) {
-    //solution is a single k/v pair {q : a}
-    //update the k/v array of the quiz accordingly
-    var s = this.state.solutions;
-    //update
-    s[problem] = solution;
-
-    this.setState({solutions: s }); 
-
-    this.checkAnswers();
-    
-  },
-
-  checkAnswers: function () {
-
-    //TODO do an ajax request here with server to check answers
-    
-    //a little hack for now to reset resubmission
-    this.setState({submittedData : null});
-
-    /***DOWN here willl be done on server side****/
-    //constructing the correct answers
-    var corr = {};
-    this.props.quiz.map(function(q){corr[q.qtext]=q.ctext;});
-
-    //assuming correctness :)
-    this.setState({correct: true});
-
-    for (var k in corr) {
-      if (this.state.solutions[k] === null || //ie doesn't exist or not selected 
-          this.state.solutions[k] != corr[k]) {
-        this.setState({correct: false});
-      }
-    }
-  
-  },
-
-  handleSubmit: function (e, submittedData) {
-    e.preventDefault();
-    this.setState({submittedData});
-  },
-
-  solveClue: function () {
-    var solution = this.refs.userInput.getDOMNode().value;
-    //if solution is correct advance to next stage and next marker
-    if (solution === this.props.clueAns) {
-       this.setState({submittedData: null}) 
-       this.setState({solutions: {}}) 
-       this.props.onComplete();
-    }
-      
-  },
-  render: function() {
-
-    var questions = this.props.quiz.map(function(e) {
-                           return <Question solution={this.receiveSolutions} qtext={e.qtext} answers={e.atext} />;
-                     }.bind(this)); 
-    var quizform = <div>
-             <h3>{this.props.loc}</h3>
-             <AutoForm onSubmit={this.handleSubmit}>
-               {questions}
-               <input type="submit" value="Submit"/>
-             </AutoForm>
-          </div>;
-
-    if (this.state.submittedData && this.state.correct){
-      return <div>
-             <h3>{this.props.loc}</h3>
-             <div><strong>{this.props.clue}</strong></div>
-             <input type="text" ref="userInput" />
-             <input type="submit" value="Take me to the next quiz" onClick={this.solveClue}/>
-          </div>;
-    }
-    else {
-      return quizform;
-    }
-  }
-});
-
-var QuizDesc = React.createClass({
-  render: function () {
-    var paragraph = <div> "This is a description and instructions to the adventure"</div>;
-    return paragraph;
-  }
-});
-
-var Monster = React.createClass({
-
-  getInitialState: function () {
-    return {won: false, loss: false};
-  },
-
-  gameWon: function () {
-    this.setState({won: true});
-  },
-
-  gameLost: function () {
-    this.setState({loss: true});
-  },
-
-  render: function(){
-    var monster = <h1>"Arrrgh... prepare for combat"</h1>;
-    //Temp
-    var link = <h2><a href="#" onClick={this.gameWon}>OK you won</a></h2>;
-    ////
-    var finalPage = <FinalPage />;
-    var finalPageLost = <FinalPageLost />;
-    if (this.state.won)
-      return <div>{finalPage}</div>;
-    else if (this.state.loss)
-      return <div>{finalPageLost}</div>;
-    else
-      return <div>{monster} {link}</div>; 
-  }
-
-});
-
-
-var Review = React.createClass({
-  getInitialState: function () {
-    return {rating: 0};
-  },
-    
-  //ask an expert in react
-  rate: function () {
-    this.setState({rating: this.refs.starInput.getDOMNode().value});
-   // this.setState({ratingText: this.state.rating+" stars"});
-    this.props.text(this.state.rating);
-  },
-
-  render: function () {
-    return  <input type="radio" name="rating" value={this.props.value} ref="starInput" onChange={this.rate}/>
-  }
-
-});
-
-
-var FinalPage = React.createClass({
-
-  getInitialState: function () {
-    return {rating: 0, ratingText: "Choose a rating"};
-  },
-
-  rate: function (value) {
-    this.setState({rating: value});
-    this.setState({ratingText: value+" stars"});
-  },
-  
-  postReview: function(value) {
-    //make a post request to post review 
-  }, 
-
-  render: function(){
-
-    var image = <div><img src={'img/wisely.jpg'} /></div>;
-
-    //TODO fix!!!!!!!!!!!!!1
-    var stars = <span className="star-rating-next">
-                   <input type="radio" name="rating" onChange={this.rate.bind(null,1)}/><i className={this.state.rating >= 1? "star-on":"star-off"}></i>
-                   <input type="radio" name="rating" onChange={this.rate.bind(null,2)}/><i className={this.state.rating >= 2? "star-on":"star-off"}></i>
-                   <input type="radio" name="rating" onChange={this.rate.bind(null,3)}/><i className={this.state.rating >= 3? "star-on":"star-off"}></i>
-                   <input type="radio" name="rating" onChange={this.rate.bind(null,4)}/><i className={this.state.rating >= 4? "star-on":"star-off"}></i>
-                   <input type="radio" name="rating" onChange={this.rate.bind(null,5)}/><i className={this.state.rating >= 5? "star-on":"star-off"}></i>
-                 </span>;
-
-    var inviteFriends = <h4><a href="#">Invite your friends</a></h4>;
-
-    return <div>
-            <h1>Congratulations!</h1>
-            {image}
-            <div>{stars}</div>
-            <div><strong>{this.state.ratingText}</strong></div>
-            {inviteFriends}
-           </div>; 
-  }
-});
-
-var FinalPageLost = React.createClass({
-
-  render: function(){
-    var image = <div><img src={'img/poorly.jpg'} /></div>;
-
-    return (
-      <div>
-      {image}
-      </div>); 
-  }
-});
-
-//start the adventure
-var PlayAdventure = React.createClass({
-  getInitialState: function() {
-    return { current: 0, 
-             showQuestions: false, 
-             resetMap: false, 
-             finalChallenge: false }
-  },
-
-  componentDidMount: function () {
-    //TODO here do ajax request to get data
-    //get the data
-    //start the map and pass it the first coordinates
-  },
-
-  proceedToNext: function() {
-    if (this.state.current < this.props.challenge.length-1){
-      this.setState({current: this.state.current + 1});
-      this.setState({showQuestions: false});
-      //reset map
-      this.setState({resetMap: true});
-    }
-    else {
-      this.setState({finalChallenge: true});
-      this.setState({resetMap: true});
-      this.setState({showQuestions: false});
-    }
-  },
-
-  renderQuestions: function() {
-    //TODO review this dirty hack
-    this.setState({resetMap: false});
-    this.setState({showQuestions: true}); 
-  },
-  
-  render: function () {
-    var challenge = this.props.challenge[this.state.current];
-    var loc     = challenge.loc;
-    var qa      = challenge.questions;
-    var clue    = challenge.clue.content;
-    var clueHint= challenge.clue.hint;
-    var clueAns = challenge.clue.answer; 
-    
-    //TODO improve logic once data is retrieved from server
-    var quiz = [{qtext: qa[0].content,
-                 ctext: qa[0].correctAnswer,
-                 atext: [qa[0].answers[0], qa[0].answers[1], qa[0].answers[2]]},
-                {qtext: qa[1].content,
-                 ctext: qa[1].correctAnswer,
-                 atext: [qa[1].answers[0], qa[1].answers[1], qa[1].answers[2]]},
-                {qtext: qa[2].content,
-                 ctext: qa[2].correctAnswer,
-                 atext: [qa[2].answers[0], qa[2].answers[1], qa[2].answers[2]]}];
-    
-    var quizForm = <Quiz onComplete={this.proceedToNext} loc={loc}  quiz ={quiz} clue={clue} clueAns={clueAns}/>;
-    var mapForm = <Map loc={loc} renderQuestions={this.renderQuestions} resetMap={this.state.resetMap} />;
-
-    var monsterForm = <Monster />;
-    var quizDescForm = <QuizDesc />;
-
-    //console.log("showing questions is: "+this.state.showQuestions);
-
-    //here a giant if-else statement with showQuestions
-    if (this.state.showQuestions) 
-      return <div><h1>{this.props.name}</h1>
-              <div className="row">
-                <div className="col-md-3">{quizForm}</div>
-                <div className="col-md-9">{mapForm}</div>
-              </div>
-            </div>;
-    else if (this.state.finalChallenge)
-      return <div><Monster /></div>;
-    else 
-      return <div><h1>{this.props.name}</h1>
-              <div className="row">
-                <div className="col-md-3">{quizDescForm}</div>
-                <div className="col-md-9">{mapForm}</div>
-              </div>
-            </div>;
-
-  } 
-});
-
+//Note this will be part of the index page
 var Adventure = React.createClass({
 
   getInitialState: function () {
     return {description: "",
             play       : false,
-            challenge       : [],
+            challenges      : [],
             detailsFetched: false}
   },
+
   fetchDetails: function () {
-    //TODO fetch details from JSON later 
-    this.setState({description: "Hello Indy"});
-    this.setState({detailsFetched: true}) 
-    this.setState({challenge: adventure.challenges}) 
+    $.ajax({
+      url: "http://localhost:3000/adventures/"+this.props.id+".json",
+      method: "GET",
+      success: function(data){
+        console.log("here are the details");
+        console.log(data);
+        this.setState({
+          description: data.description,
+          challenges: data.challenges,
+          detailsFetched: true
+        }); 
+        console.log(this.state.challenges);
+      }.bind(this)
+    });
   },
 
   startAdventure: function () {
@@ -332,8 +31,7 @@ var Adventure = React.createClass({
 
   render: function () {
     if (this.state.play) {
-      //TODO finish
-      return <PlayAdventure name= {this.props.name} challenge={this.state.challenge} />
+      return <PlayAdventure name= {this.props.name} challenges={this.state.challenges} />
     }
     else if (this.state.detailsFetched) {
       return <div>
@@ -351,24 +49,31 @@ var Adventure = React.createClass({
 
 });
 
-//TODO
 var Adventures = React.createClass({
   getInitialState: function () {
-    return {adventures: [], showSpinner: true}
+    return {adventures: [], 
+            showSpinner: true}
   },
 
   componentDidMount: function () {
-    //TODO make an ajax request
+    
     //for now just do the following
-    var data = [{"name": "Find the Holy Grail", "description": "Indy!!!"}];
-    this.setState({adventures: data});
-    this.setState({showSpinner: false});
+    //var data = [{"name": "Find the Holy Grail", "description": "Indy!!!"}];
+    var url = "http://localhost:3000/adventures";
+    $.ajax({
+      type: "GET",
+      url: url,
+      success: function (data) {
+        this.setState({adventures: data});
+        this.setState({showSpinner: false});
+      }.bind(this)
+    });
   },
 
   render: function () {
     
     var adventures = this.state.adventures.map(function(a) {
-      return <Adventure name={a.name} />; //don't forget the id
+      return <Adventure name={a.title} id={a.id} />; 
     });
     var spinnerDisplay = this.state.showSpinner ? "block" : "none";
     var spinnerStyle   = {display: spinnerDisplay};
