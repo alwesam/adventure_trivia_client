@@ -7,39 +7,39 @@ var adventure = {
   //contents will be empty 
   challenges: [
         {
-          loc: "Rome, Italy",
+          address: "Rome, Italy",
           questions: [
                       {"content" : "What is the capital of Spain?", 
-                       "correctAnswer": "Madrid", 
+                       "answer": "Madrid", 
                        "answers" :
-                        ["Madrid", 
-                         "London", 
-                         "Istanbul"]
+                        [{content: "Madrid"}, 
+                         {content: "London"}, 
+                         {content: "Istanbul"}]
                       }, 
 
                       {"content" : "What is the capital of Austria?", 
-                       "correctAnswer" : "Vienna",
+                       "answer" : "Vienna",
                        "answers" :
-                        ["Madrid", 
-                        "Vienna", 
-                        "Berlin"]
+                        [{content: "Madrid"}, 
+                         {content: "Vienna"}, 
+                         {content: "Berlin"}]
                       }, 
 
                       {"content" : "What is the capital of Poland?", 
-                       "correctAnswer" : "Warsaw",
+                       "answer" : "Warsaw",
                        "answers"  :
-                        ["Madrid", 
-                        "Vienna", 
-                        "Warsaw"]
+                        [{content: "Madrid"}, 
+                         {content: "Vienna"}, 
+                         {content: "Warsaw"}]
                       } 
           ],
-          clue: {"content" : "closest metropolis to the pyramids", "hint": "What the capital of Egypt", "answer" : "cairo"}
+          riddle: {"content" : "closest metropolis to the pyramids", "hint": "What the capital of Egypt", "answer" : "cairo"}
         }, 
         {
-          loc: "Giza Necropolis, Giza, Egypt",
+          address: "Giza Necropolis, Giza, Egypt",
           questions: [
                       {"content" : "What is the capital of Egypt?", 
-                       "correctAnswer" : "Cairo",
+                       "answer" : "Cairo",
                        "answers" :
                         ["Cairo", 
                          "Amman", 
@@ -47,7 +47,7 @@ var adventure = {
                       }, 
 
                       {"content" : "What is the capital of Iraq?", 
-                       "correctAnswer" : "Baghdad",
+                       "answer" : "Baghdad",
                        "answers" :
                         ["Baghdad", 
                         "Damascus", 
@@ -55,7 +55,7 @@ var adventure = {
                       }, 
 
                       {"content" : "What is the capital of Libya?", 
-                       "correctAnswer" : "Tripoli",
+                       "answer" : "Tripoli",
                        "answers"  :
                         ["Cairo", 
                         "Tripoli", 
@@ -65,10 +65,10 @@ var adventure = {
           clue: {"content" : "Indian Jones was there", "hint" : "It was the capital of Naabatean Kingdom", "answer" : "petra"}
         }, 
         {
-          loc: "Petra, Kingdom of Jordan",
+          address: "Petra, Kingdom of Jordan",
           questions: [
                       {"content" : "What is the capital of Iran?", 
-                       "correctAnswer" : "Tehran",
+                       "answer" : "Tehran",
                        "answers" :
                         ["Delhi", 
                          "Tehran", 
@@ -76,7 +76,7 @@ var adventure = {
                       }, 
 
                       {"content" : "What is the capital of Qatar?", 
-                       "correctAnswer" : "Doha",
+                       "answer" : "Doha",
                        "answers" :
                         ["Kuwait", 
                         "Jerusalem", 
@@ -84,15 +84,15 @@ var adventure = {
                       }, 
 
                       {"content" : "What is the capital of Oman?", 
-                       "correctAnswer" : "Muscat",
+                       "answer" : "Muscat",
                        "answers"  :
                         ["Muscat", 
                         "Dubai", 
                         "Manama"]
                       } 
           ],
-          clue: {"content" : "What is one plus one", "hint" : "do you even read?", "answer" : "two"}
+          riddle: {"content" : "What is one plus one", "hint" : "do you even read?", "solution" : "two"}
         } 
   ],
-  finalChallenge: true
+  include_final: true
 }; 

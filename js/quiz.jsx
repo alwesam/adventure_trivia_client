@@ -1,7 +1,9 @@
 var Answer = React.createClass({
   logCheck: function () {
     if(this.refs.radioInput.getDOMNode().checked)
-      this.props.passAns(this.props.atext);
+      //not the best solution
+      this.props.passAns(this.props.atext.content);
+      //debugger
   },
   render: function() {
     return <div>
@@ -61,6 +63,8 @@ var Quiz = React.createClass({
     //constructing the correct answers
     var corr = {};
     this.props.quiz.map(function(q){corr[q.qtext]=q.ctext;});
+
+    //debugger
 
     //assuming correctness :)
     this.setState({correct: true});

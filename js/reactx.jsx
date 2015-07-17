@@ -13,7 +13,7 @@ var Adventure = React.createClass({
       url: "http://localhost:3000/adventures/"+this.props.id+".json",
       method: "GET",
       success: function(data){
-        console.log("here are the details");
+        console.log("here are the details of adventure >>>>>>>>>>>>>>>>>");
         console.log(data);
         this.setState({
           description: data.description,
@@ -31,7 +31,7 @@ var Adventure = React.createClass({
 
   render: function () {
     if (this.state.play) {
-      return <PlayAdventure name= {this.props.name} challenges={this.state.challenges} />
+      return <PlayAdventure include_final={true} name= {this.props.name} challenges={this.state.challenges} />
     }
     else if (this.state.detailsFetched) {
       return <div>
@@ -118,7 +118,6 @@ var HomePage = React.createClass({
 
 var initialize = function () {
   //for now
-  //React.render(<PlayAdventure name= {adventure.name} challenge={adventure.challenges} />, document.getElementById("adventure"));
   React.render(<HomePage />, document.getElementById("adventure"));
   //React.render(<FinalPage />, document.getElementById("adventure"));
 }

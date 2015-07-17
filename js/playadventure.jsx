@@ -2,86 +2,88 @@
 var PlayAdventure = React.createClass({
   getInitialState: function() {
     return { current: 0, 
+             challengeID: 0,
              showQuestions: false, 
              resetMap: false, 
              finalChallenge: false }
   },
 
   componentDidMount: function () {
+
   },
 
   proceedToNext: function() {
     if (this.state.current < this.props.challenges.length-1){
+
+      //get questions from ajax and answers
+
       this.setState({current: this.state.current + 1});
-      //here get the next batch of questions
-      //do a get request to get riddle
 
-
-      this.setState({showQuestions: false});
       //reset map
-      this.setState({resetMap: true});
+      this.setState({showQuestions: false, resetMap: true});
     }
     else {
-      this.setState({finalChallenge: true});
-      this.setState({resetMap: true});
-      this.setState({showQuestions: false});
+      this.setState({finalChallenge: true, resetMap: true, showQuestions: false});
     }
   },
 
+  //this is called when a marker is clicked
   renderQuestions: function() {
-    //TODO review this dirty hack
-    this.setState({resetMap: false});
-    this.setState({showQuestions: true}); 
+    this.setState({
+          resetMap          : false,
+          showQuestions     : true
+        }); 
   },
-  
+
   render: function () {
+    //at least I got this correct
+    //here I'm getting all the data at once!
     var challenge = this.props.challenges[this.state.current];
-    //debugger
     var loc     = challenge.address;
     var lat     = challenge.latitude; 
     var lng     = challenge.longitude; 
+    var qa      = challenge.questions;
 
-    //differ later
-    var qa      = [{content: "boo", correctAnswer:"boo", answers: ["boo","boo","boo"]},
-                   {content: "boo", correctAnswer:"boo", answers: ["boo","boo","boo"]},
-                   {content: "boo", correctAnswer:"boo", answers: ["boo","boo","boo"]}];
-    var clue    = "Just make you happy";
-    var clueHint= "Just make you happy";
-    var clueAns = "Just make you happy"; 
-    
+    var riddle     = challenge.riddle.content;
+    var hint = challenge.riddle.hint;
+    var solution = challenge.riddle.solution; 
+
     //TODO improve logic once data is retrieved from server
     var quiz = [{qtext: qa[0].content,
-                 ctext: qa[0].correctAnswer,
-                 atext: [qa[0].answers[0], qa[0].answers[1], qa[0].answers[2]]},
-                {qtext: qa[1].content,
-                 ctext: qa[1].correctAnswer,
-                 atext: [qa[1].answers[0], qa[1].answers[1], qa[1].answers[2]]},
-                {qtext: qa[2].content,
-                 ctext: qa[2].correctAnswer,
-                 atext: [qa[2].answers[0], qa[2].answers[1], qa[2].answers[2]]}];
+                 ctext: qa[0].answer,
+                 atext: [qa[0].answers[0], qa[0].answers[1], qa[0].answers[2]]}];
     
-    var quizForm = <Quiz onComplete={this.proceedToNext} loc={loc}  quiz ={quiz} clue={clue} clueAns={clueAns}/>;
-    var mapForm = <Map loc={loc} renderQuestions={this.renderQuestions} resetMap={this.state.resetMap} />;
+    var quizForm = <Quiz onComplete={this.proceedToNext} loc={loc} quiz ={quiz} clue={riddle} clueAns={solution}/>;
+    var mapForm = <Map loc={loc} lat={lat} lng={lng} renderQuestions={this.renderQuestions} resetMap={this.state.resetMap} />;
 
     var monsterForm = <Monster />;
     var quizDescForm = <QuizDesc />;
 
     //here a giant if-else statement with showQuestions
-    if (this.state.showQuestions) 
+
+    if (this.state.showQuestions) {  //renders along with answers
+      //here slide question form infront of map or along with it
+
       return <div><h1>{this.props.name}</h1>
               <div className="row">
                 <div className="col-md-3">{quizForm}</div>
                 <div className="col-md-9">{mapForm}</div>
               </div>
             </div>;
-    else if (this.state.finalChallenge && this.props.include_final)
+    }
+    else if (this.state.finalChallenge && this.props.include_final) { //after finish challenges
+
       return <div><Monster /></div>;
-    else 
+    
+    }
+    else { 
+
       return <div><h1>{this.props.name}</h1>
               <div className="row">
                 <div className="col-md-3">{quizDescForm}</div>
                 <div className="col-md-9">{mapForm}</div>
               </div>
             </div>;
+    }
   } 
 });

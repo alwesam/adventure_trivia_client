@@ -210,14 +210,15 @@ var CreateAdventure = React.createClass({
     //use to test data
     var challenges = [];
     challenges [0] = {address: "Rome, Italy", 
-                    riddle: {content: "hi", hint: "hello", solution: "thanks"}, 
-                    questions: [{content : "Q1", answer: "A1", answers: [{content: "hello"}]}]};
-    challenges [1] = {address: "Naples, Italy", 
-                    riddle: {content: "hi", hint: "hello", solution: "thanks"}, 
-                    questions: [{content : "Q3", answer: "A3", answers: [{content: "hello"}]}]};
+                    riddle: {content: "What's a riddle?", hint: "It's obvious", solution: "It's a riddle"}, 
+                    questions: [{content : "What's the capital of Italy", answer: "Rome", answers: [{content: "Rome"},{content: "Naples"},{content: "Paris"}]}]};
 
-    var datatest = {adventure : {"title": "Indy",
-               description: "Description",
+    challenges [1] = {address: "Naples, Italy", 
+                    riddle: {content: "What's a riddle?", hint: "It's obvious", solution: "It's a riddle"}, 
+                    questions: [{content : "What's the capital of Italy", answer: "Rome", answers: [{content: "Rome"},{content: "Naples"},{content: "Paris"}]}]};
+
+    var datatest = {adventure : {title: "Indiana goes to Italy",
+               description: "Indiana kicks ass",
                challenges : challenges,
                include_final: true 
               }} 
