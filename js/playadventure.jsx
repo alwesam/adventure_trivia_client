@@ -63,11 +63,10 @@ var PlayAdventure = React.createClass({
 
     if (this.state.showQuestions) {  //renders along with answers
       //here slide question form infront of map or along with it
-
       return <div><h1>{this.props.name}</h1>
-              <div className="row">
-                <div className="col-md-3">{quizForm}</div>
-                <div className="col-md-9">{mapForm}</div>
+              <div className="question-map-box">
+                <div className="question-box">{quizForm}</div>
+                <div >{mapForm}</div>
               </div>
             </div>;
     }

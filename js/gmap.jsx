@@ -2,7 +2,7 @@ var Marker = React.createClass({
 
   getInitialState: function () {
   
-    return {currentMarker: null, gems: [], stopAdding: false};
+    return {currentMarker: null, gems: [], init: true};
 
   },
 
@@ -13,7 +13,7 @@ var Marker = React.createClass({
   addMarker: function (place) {
 
       var lat = place.geometry.location.lat();  
-      var lon = place.geometry.location.lng(); 
+      var lng = place.geometry.location.lng(); 
 
       //console.log("the state of current marker "+this.state.currentMarker);
 
@@ -21,7 +21,7 @@ var Marker = React.createClass({
       var marker = new google.maps.Marker({
         //I'm getting the map from Map
               map: this.props.map,
-              //position: new google.maps.LatLng(this.props.lat, this.props.lon),
+              //position: new google.maps.LatLng(this.props.lat, this.props.lng),
               position: place.geometry.location,
               title: this.props.loc 
       });
@@ -33,9 +33,10 @@ var Marker = React.createClass({
       });
 
       //extend map as markers are added
-      this.props.extendMap(this.props.bounds, lat, lon);
+      //TODO do in the map
+      this.props.extendMap(this.props.bounds, lat, lng);
 
-      this.setState({currentMarker: marker});
+      //this.setState({currentMarker: marker});
 
       google.maps.event.addListener(marker,'click',function() {          
           var bool = (this.state.currentMarker === marker);
@@ -166,12 +167,10 @@ var Marker = React.createClass({
 
   render: function () {
     
-    console.log("Hello, I'm rendered");
     //first step is to decode the location
-    if(this.state.currentMarker === null || 
-       this.state.currentMarker.getTitle() !== this.props.loc){ 
+    if(this.state.currentMarker == null || 
+        this.state.currentMarker.getTitle() != this.props.loc)
         this.decodeLoc(); //this runs asynchronously
-    }
 
     //return null since not creating new html elements
     return null;
@@ -236,9 +235,9 @@ var Map = React.createClass({
   
   },
 
-  resizeMap: function (bounds, lat, lon) {
-    if(lat !== undefined && lon !== undefined)
-	    bounds.extend(new google.maps.LatLng(lat, lon));
+  resizeMap: function (bounds, lat, lng) {
+    if(lat !== undefined && lng !== undefined)
+	    bounds.extend(new google.maps.LatLng(lat, lng));
 
     var map = this.state.map;
 	  map.fitBounds(bounds);
@@ -273,8 +272,9 @@ var Map = React.createClass({
     if(this.state.map) {
 
       //
-      markers = <Marker loc={this.props.loc} //or lat, lng if use geocoder in rails 
+      markers = <Marker loc={this.props.loc} lat={this.props.lat} lng={this.props.lng}
                         renderQuestions = {this.props.renderQuestions}
+                        proceed = {this.props.resetMap}
                         map={this.state.map} 
                         sendMarkers={this.sendMarkers}
                         panorama={this.state.panorama} 

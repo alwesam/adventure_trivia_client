@@ -185,8 +185,6 @@ var CreateAdventure = React.createClass({
   },
 
   addAdventureObject: function (index, obj) {
-    console.log("object to be plastered ", obj);
-    console.log("adventure challenges length "+this.state.adventureChallenges.length);
     var challenge = this.state.adventureChallenges;
     challenge[index] = obj;
     //Test
@@ -204,8 +202,8 @@ var CreateAdventure = React.createClass({
               } 
 
     //check data
-    //console.log(data);
-    //console.log(JSON.stringify(data));
+    console.log(data);
+    console.log(JSON.stringify(data));
 
     //use to test data
     var challenges = [];
@@ -225,6 +223,7 @@ var CreateAdventure = React.createClass({
 
     var url ="http://localhost:3000/adventures"; 
     
+    /*
     $.ajax({
       type: "POST",
       url: url,
@@ -232,7 +231,7 @@ var CreateAdventure = React.createClass({
       success: function (data) {
         console.log(data);
       }.bind(this)
-    });
+    });*/
 
   },
 
