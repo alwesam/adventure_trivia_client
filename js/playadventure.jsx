@@ -16,6 +16,7 @@ var PlayAdventure = React.createClass({
     if (this.state.current < this.props.challenges.length-1){
 
       //get questions from ajax and answers
+      console.log("incrementing state>>>>>>>>>>>>>>>>>>>>>>>");
 
       this.setState({current: this.state.current + 1});
 
@@ -43,6 +44,9 @@ var PlayAdventure = React.createClass({
     var lat     = challenge.latitude; 
     var lng     = challenge.longitude; 
     var qa      = challenge.questions;
+
+    console.log(this.state.current);
+    console.log(loc);
 
     var riddle     = challenge.riddle.content;
     var hint = challenge.riddle.hint;

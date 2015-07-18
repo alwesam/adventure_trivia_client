@@ -1,28 +1,37 @@
 var Marker = React.createClass({
 
   getInitialState: function () {
-  
-    return {currentMarker: null, gems: [], init: true};
-
+    return {currentMarker: null, gems: [], currentLoc: ""};
   },
 
-  componentDidUpdate: function () {
-    console.log("hello there, I'm updated");
+  //for first time rendering
+  componentDidMount: function () {
+    this.setState({currentLoc: this.props.loc});
+  },
+
+  componentWillReceiveProps: function (nextProps) {
+    //check for glitches
+    if (nextProps.loc != this.props.loc)
+      this.setState({currentLoc: nextProps.loc});
+  },
+
+  //once state with current location, place it on the map
+  componentDidUpdate: function (prevProps, prevState) {
+    if(prevState.currentLoc != this.state.currentLoc)
+      this.addMarker();
   },
 
   addMarker: function (place) {
 
-      var lat = place.geometry.location.lat();  
-      var lng = place.geometry.location.lng(); 
-
-      //console.log("the state of current marker "+this.state.currentMarker);
+      //var lat = place.geometry.location.lat();  
+      //var lng = place.geometry.location.lng(); 
 
       //create a new marker object to be placed on map
       var marker = new google.maps.Marker({
         //I'm getting the map from Map
               map: this.props.map,
-              //position: new google.maps.LatLng(this.props.lat, this.props.lng),
-              position: place.geometry.location,
+              position: new google.maps.LatLng(this.props.lat, this.props.lng),
+              //position: place.geometry.location,
               title: this.props.loc 
       });
 
@@ -34,20 +43,15 @@ var Marker = React.createClass({
 
       //extend map as markers are added
       //TODO do in the map
-      this.props.extendMap(this.props.bounds, lat, lng);
+      this.props.extendMap(this.props.bounds, this.props.lat, this.props.lng);
 
-      //this.setState({currentMarker: marker});
+      this.setState({currentMarker: marker});
 
+      //add event listner
       google.maps.event.addListener(marker,'click',function() {          
-          var bool = (this.state.currentMarker === marker);
-          console.log("current marker at first click "+bool);
           marker.setVisible(false);
-          //console.log("current marker is "+this.state.currentMarker.getVisible());
-          //marker.setClickable(false);
-          this.gotoLocation();
+          this.gotoLocation(); //zoom into the location
       }.bind(this)); 
-
-      return marker;
 
   },
 
@@ -62,12 +66,9 @@ var Marker = React.createClass({
     //callback functin is make to add the marker
     service.textSearch(request, function (results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-          if (this.state.currentMarker === null || 
-              this.state.currentMarker.getTitle() !== this.props.place)
-              this.setState({currentMarker: this.addMarker(results[0])});
+          this.setState({currentMarker: this.addMarker(results[0])});
         }
     }.bind(this)); 
-  
   },
    
   //this function is called when location is clicked
@@ -124,7 +125,7 @@ var Marker = React.createClass({
               icon: _GREEN
           });
           
-          drawLine(marker.getPosition(), target.getPosition());
+          //drawLine(marker.getPosition(), target.getPosition());
 
           //from google maps api docs: Returns the heading from one LatLng to another LatLng.
           //Headings are expressed in degrees clockwise from North within the range [-180,180).
@@ -140,8 +141,10 @@ var Marker = React.createClass({
           panorama.setVisible(true);
 
           google.maps.event.addListener(target, 'click', function() {
+              //here call the question
               that.props.renderQuestions();
-              target.setVisible(false);
+              //set icon to flag and set to unclickable
+              target.setClickable(false);
               //panorama.setVisible(false);
           });
 
@@ -154,7 +157,7 @@ var Marker = React.createClass({
 
             streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
           } else {
-            console.log("sorry")
+            console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters")
           }
           
         }
@@ -166,12 +169,6 @@ var Marker = React.createClass({
   },
 
   render: function () {
-    
-    //first step is to decode the location
-    if(this.state.currentMarker == null || 
-        this.state.currentMarker.getTitle() != this.props.loc)
-        this.decodeLoc(); //this runs asynchronously
-
     //return null since not creating new html elements
     return null;
   }
@@ -270,7 +267,6 @@ var Map = React.createClass({
     
     var markers;
     if(this.state.map) {
-
       //
       markers = <Marker loc={this.props.loc} lat={this.props.lat} lng={this.props.lng}
                         renderQuestions = {this.props.renderQuestions}

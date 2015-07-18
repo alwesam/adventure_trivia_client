@@ -4,17 +4,19 @@ var CreateChallenges = React.createClass({
     return {stage: 0, challenges: []}; //number of stages correspond to number of locations here 
   },
 
+  componentDidUpdate: function (prevState, nexState) {
+   if (this.state.stage != prevState.stage && 
+       this.state.stage === this.props.locs.length)
+        this.pass(); 
+  },
+
   addChallenge: function (challenge_obj) { //returns an object {address: "", questions: "", riddle: ""}
 
-    if(this.state.stage < this.props.locs.length-1){
-      //a bit iffy
+      console.log("adding to challenge*** "+this.state.stage);
       var arr = this.state.challenges;
       arr.push(challenge_obj);
       this.setState({challenges: arr});
       this.setState({stage: this.state.stage+1});
-    } else {
-      this.pass();
-    }
     
   },
 
@@ -25,7 +27,7 @@ var CreateChallenges = React.createClass({
 
   render: function () {
     return <CreateChallenge loc={this.props.locs[this.state.stage]}
-                            nextLoc = {this.props.locs[this.state.stage+1]} //check for null value
+                            nextLoc = {this.props.locs[this.state.stage+1]} //TODO debug check for null value
                              addToChallenges={this.addChallenge} />;
   }
 

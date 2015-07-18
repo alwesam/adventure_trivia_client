@@ -13,7 +13,6 @@ var CreateRiddle = React.createClass({
 
   hintInput: function () {
     this.setState({hint: this.refs.hintInput.getDOMNode().value}); 
-    //this.pass();
   },
 
   pass: function () {
@@ -37,10 +36,10 @@ var CreateRiddle = React.createClass({
     var solution = <div><input type="text" placeholder="Enter Solution" ref="solutionInput" onChange={this.solutionInput}/></div>;  
     var hint = <div><textarea name="Hint" placeholder="Enter Hint" ref="hintInput" onChange={this.hintInput} /></div>;  
 
-    var submitButton = <div><input type="submit" value="Next Question" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
+    var submitButton = <div><input type="submit" value="Submit Riddle" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
 
     if(this.props.nextLoc != null)
-      var nextLoc = <div>Enter a riddle leading to {this.props.nextLoc}</div>;
+      var nextLoc = <div>Enter a riddle pour prochaine loc {this.props.nextLoc}</div>;
     else
       var nextLoc = <div>Enter a Riddle of your Choice</div>;
    
