@@ -12,6 +12,8 @@ var CreateChallenge = React.createClass({
   },
 
   componentDidUpdate: function (prevProps, prevState) {
+    if (prevProps.loc != this.props.loc)
+      this.setState({questions: []}); //flush
   },
 
   addQuestion: function (question_obj) {
@@ -30,7 +32,6 @@ var CreateChallenge = React.createClass({
     //test point
     //var obj = {address: this.props.loc, questions: "This is a question", riddle: "this is a riddle"}; 
     var obj = {address: this.props.loc, questions: this.state.questions, riddle: this.state.riddle}; 
-    this.setState({proceed: false}); //loop back
     this.props.addToChallenges(obj);
   },
 
@@ -46,13 +47,12 @@ var CreateChallenge = React.createClass({
   render: function () {
 
     console.log("my state now is "+this.state.stage);
-    var submitButton = <div><input type="submit" value="Next Question" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
+    var submitButton = <div><input type="submit" value="Next Stage" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
 
     //var submitQuestion = <div><input type="submit" value="Submit Question" onClick={this.completeQuestions} /></div>;
 
     if(this.state.stage == 0) //first answer question(s)
-      //return <div> Here is my question about {this.props.loc} {submitQuestion} </div>; //replace with question form 
-      return <div> <div> Here is my question about {this.props.loc}</div> <CreateQuestion addToQuestions={this.addQuestion} /> </div>;
+      return <div> <div> Here is my question about {this.props.loc}</div> <CreateQuestion addToQuestions={this.addQuestion} loc={this.props.loc} /> </div>;
     else if(this.state.stage == 1) //then answer riddle
       return <div> <CreateRiddle nextLoc={this.props.nextLoc} pass={this.receiveRiddle} />  </div>;
     else if(this.state.stage == 2 && this.props.nextLoc != null) //then go to nextstage
