@@ -8,6 +8,7 @@ var Adventure = React.createClass({
             detailsFetched: false}
   },
 
+  //TODO don't fetch the whole thing at once
   fetchDetails: function () {
     $.ajax({
       url: "http://localhost:3000/adventures/"+this.props.id+".json",
@@ -31,6 +32,7 @@ var Adventure = React.createClass({
 
   render: function () {
     if (this.state.play) {
+      //TODO need to flush the whole DOM and start again with a new page
       return <PlayAdventure include_final={true} name= {this.props.name} challenges={this.state.challenges} />
     }
     else if (this.state.detailsFetched) {
@@ -42,7 +44,7 @@ var Adventure = React.createClass({
     }
     else {
       return <div>
-              <a href="#" onClick={this.fetchDetails}> {this.props.name}</a>
+              <h3><a href="#" onClick={this.fetchDetails}> {this.props.name}</a></h3>
              </div>;
     }
   }
@@ -77,6 +79,7 @@ var Adventures = React.createClass({
     });
     var spinnerDisplay = this.state.showSpinner ? "block" : "none";
     var spinnerStyle   = {display: spinnerDisplay};
+    //TODO Problem here
     return <div className="text-center">
              <div style={spinnerStyle}>Loading...</div>
              {adventures}

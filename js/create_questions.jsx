@@ -1,4 +1,3 @@
-
 var MakeAnswers = React.createClass({
 
   getInitialState: function(){
@@ -44,56 +43,65 @@ var CreateQuestion = React.createClass({
   getInitialState: function(){
     return {qtext: "",
             answer: "",
-            choices: [],
-            answerType: null};
+            log: false,
+            choices: []
+            };
   },
 
-  componentDidUpdate: function (prevProps, prevState) {
-    //if (prevProps.loc != this.props.loc)
-    //  this.setState({choices: []}); //flush
+  componentWillReceiveProps(nextProps) {},
+
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.log)
+      this.pass(); 
   },
 
   addToQuestion: function (index, correct, choice) {
     console.log("adding answer to question index: "+index);
     var choices = this.state.choices;
-    choices[index] = choice;
+    choices[index] = {content: choice};
     //choices.push(choice);
     this.setState({choices: choices});
     this.setState({answer: correct});
-    //TODO fix
-    //if (correct)
-    //  this.setState({answer: choice});
+    this.setState({log: true});
   },
 
   questionInput: function () {
     //debugger
     this.setState({qtext: this.refs.questionInput.getDOMNode().value}); 
+    this.setState({log: true});
     //pass the question to Quiz
   },
 
+  //pass a prop
+  pass: function () {
+    console.log("passing question");
+    this.setState({log: false});
+    this.props.addToQuestions(this.props.index,
+                              {content: this.state.qtext,
+                               answer: this.state.answer, 
+                               answers: this.state.choices});
+  },
+
+  //TODO remove
   onSubmit: function () {
     this.props.addToQuestions({content: this.state.qtext,
                                answer: this.state.answer, 
                                answers: this.state.choices});
   },
-    
-  //TODO
-  answerType: function () {
+  //TODO ok this is messy and it causes JS errors, but it works
+  isReady: function () {
+    return (this.state.answer.length > 0 && this.state.choices.length > 0) 
   },
 
   render: function () {
 
-    var submitQuestion = <div><input type="submit" value="Submit Question" onClick={this.onSubmit} /></div>;
-
+    //var submitQuestion = <div><input type="submit" value="Submit Question" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
 
     var question = <div><input type="text" 
                            placeholder="Enter Question" 
                            ref="questionInput" 
                            onChange={this.questionInput}/></div>;
 
-    //TODO
-    //var answerType = <select><option value="multiple">Multiple Choice</option></select>
-    //var answerType;
     //3 possible answers.... for now
     var answers = ['','',''].map(function (answer, index) {
       return (
@@ -103,10 +111,64 @@ var CreateQuestion = React.createClass({
       );
     }.bind(this));
 
-    //test
-    //return <div>{question} {submitQuestion}</div>;
-      //TODO investigate whey break
-    return <div> {question} {answers} {submitQuestion}</div>; 
+    //return <div> {question} {answers} {submitQuestion}</div>; 
+    return <div> {question} {answers} </div>; 
+  }
+
+});
+
+var CreateQuestionsContainer = React.createClass({
+  getInitialState: function(){
+    return {  numQuestions: 1,
+              questions: []
+            };
+  },
+
+  addQuestion: function () {
+    this.setState({numQuestions: this.state.numQuestions+1});
+  },
+
+  addToContainer: function (index, question_obj) {
+    var arr = this.state.questions;
+    arr[index] = question_obj; 
+    this.setState({questions: arr});
+  },
+
+  onSubmit: function () {
+    //pass an array of objects
+    console.log("passing an arry of objects"+this.state.questions);
+    this.props.addToChallenge(this.state.questions);
+  },
+
+  //TODO ok this is messy and it causes JS errors, but it works
+  isReady: function () {
+    return true; //for now
+  },
+
+  render: function () {
+    var arr=[]; 
+    for(var i=0; i<this.state.numQuestions; i++)
+      arr.push('');
+
+    var submitQuestions= <div><input type="submit" value="Submit Question" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
+
+    console.log("array of questions length "+arr.length);
+
+    //test TODO >>>>>>>>>>>>>>>>>>>>>>>>>.
+    var questions = arr.map(function (question, index){
+      return (
+          <div key={index}>
+            <CreateQuestion addToQuestions={this.addToContainer} index={index} />
+          </div>
+        ); 
+    }.bind(this));
+
+    return <div><h3>Questions about {this.props.loc}</h3>
+                {questions}
+                <div><a href="#" onClick={this.addQuestion}> Add Question </a></div>
+                 {submitQuestions}
+           </div>; 
+  
   }
 
 });

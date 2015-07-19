@@ -34,15 +34,29 @@ var CreateAdventure = React.createClass({
     console.log(this.state.title);
     console.log(this.state.description);
     console.log(this.state.includeFinal);
-    var jsonData = {title: this.state.title,
+
+    var jsonData = {adventure: {title: this.state.title,
                 description: this.state.description,
                 challenges: this.state.challenges,
-                includeFinal: this.state.includeFinal};
+                includeFinal: this.state.includeFinal}};
     console.log("And here is the data>>>>>>>>>>>>>>>>>>>>>>>>>");
     console.log(jsonData);
-    //construct a json and do an
-    //ajax post request to server 
-    //and then render home page
+
+    var url ="http://localhost:3000/adventures"; 
+    
+    $.ajax({
+      type: "POST",
+      url: url,
+      data: jsonData,
+      success: function (data) {
+        console.log(data);
+        this.setState({stage: 3});//list of adventures 
+      }.bind(this)
+    });
+  },
+
+  startAgain: function () {
+    this.setState({stage: 0});
   },
 
   isReady: function () {
@@ -64,7 +78,10 @@ var CreateAdventure = React.createClass({
         return <CreateChallenges locs={this.state.locations} pass={this.receiveChallenges} />; //call challenges container 
         break;
       case 2: 
-        return <div>{includeGame} {submitButton}</div>
+        return <div>{includeGame} {submitButton}</div>;
+        break;
+      case 3: 
+        return <div className="container"><Adventures /></div>;
         break;
     }
 
