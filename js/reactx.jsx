@@ -26,8 +26,10 @@ var Adventure = React.createClass({
     });
   },
 
+  //TODO review code
   startAdventure: function () {
-    this.setState({play: true});
+    //this.setState({play: true});
+    this.props.start(this.props.name, this.state.challenges);
   },
 
   render: function () {
@@ -54,6 +56,9 @@ var Adventure = React.createClass({
 var Adventures = React.createClass({
   getInitialState: function () {
     return {adventures: [], 
+            startAdventure: false,
+            title: "",
+            challenges: '',
             showSpinner: true}
   },
 
@@ -72,18 +77,30 @@ var Adventures = React.createClass({
     });
   },
 
+  //TODO, review this code looks a bit prolematic
+  start: function (title, challenges) {
+    this.setState({startAdventure: true, title: title, challenges: challenges}); 
+  },
+
   render: function () {
     
     var adventures = this.state.adventures.map(function(a) {
-      return <Adventure name={a.title} id={a.id} />; 
-    });
+      return <Adventure name={a.title} id={a.id} start={this.start} />; 
+    }.bind(this));
     var spinnerDisplay = this.state.showSpinner ? "block" : "none";
     var spinnerStyle   = {display: spinnerDisplay};
     //TODO Problem here
-    return <div className="text-center">
-             <div style={spinnerStyle}>Loading...</div>
-             {adventures}
-           </div>;
+    if (this.state.startAdventure) {
+      return <div className="text-center"><PlayAdventure include_final={true}
+                            name= {this.state.title} 
+                            challenges={this.state.challenges} /></div>;
+    }
+    else {
+      return <div className="text-center">
+               <div style={spinnerStyle}>Loading...</div>
+               {adventures}
+             </div>;
+    }
   }
 });
 
