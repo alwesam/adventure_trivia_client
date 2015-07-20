@@ -1,7 +1,11 @@
 var Marker = React.createClass({
 
   getInitialState: function () {
-    return {currentMarker: null, gems: [], currentLoc: ""};
+    return {currentMarker: null, 
+      gems: [], gem: null, 
+      nextStop: null, 
+      markerStatus: "",
+      currentLoc: ""};
   },
 
   //for first time rendering
@@ -10,71 +14,94 @@ var Marker = React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
-    //check for glitches
+ 
+    console.log("current loc>>>>>: "+this.props.loc);
+    console.log("next loc>>>>>: "+nextProps.loc);
+    console.log("current stop>>>>>: "+this.props.nextStop);
+    console.log("next stop>>>>>: "+nextProps.nextStop);
+
     if (nextProps.loc != this.props.loc)
       this.setState({currentLoc: nextProps.loc});
+  
+    if (nextProps.nextStop != this.props.nextStop &&
+        nextProps.nextStop.length >0 )
+        this.setState({nextStop: nextProps.nextStop});
   },
 
   //once state with current location, place it on the map
   componentDidUpdate: function (prevProps, prevState) {
     if(prevState.currentLoc != this.state.currentLoc)
-      this.addMarker();
+      this.setState({currentMarker: this.addMarker(null)});
+    else { 
+      if(prevState.nextStop != this.state.nextStop)
+        this.addStop();
+    }
+  },
+
+  addStop: function (){
+    this.decodeTarget();
   },
 
   addMarker: function (place) {
 
-      //var lat = place.geometry.location.lat();  
-      //var lng = place.geometry.location.lng(); 
+     if(place != null){
+      var lat  = place.geometry.location.lat();  
+      var lng  = place.geometry.location.lng(); 
+      var name = place.formatted_address; 
+     }
+     else {
+      var lat  = this.props.lat;  
+      var lng  = this.props.lng; 
+      var name = this.props.loc; 
+     }
 
-      //create a new marker object to be placed on map
+
       var marker = new google.maps.Marker({
-        //I'm getting the map from Map
               map: this.props.map,
-              position: new google.maps.LatLng(this.props.lat, this.props.lng),
-              //position: place.geometry.location,
-              title: this.props.loc 
+              position: new google.maps.LatLng(lat, lng),
+              title: name 
       });
 
-      console.log("marker added"); 
-
       marker.infoBox = new google.maps.InfoWindow({
-        content: "marker added successfully" 
+        content: name 
       });
 
       //extend map as markers are added
-      //TODO do in the map
-      this.props.extendMap(this.props.bounds, this.props.lat, this.props.lng);
-
-      this.setState({currentMarker: marker});
+      //TODO do in the map check!!!!!!!!
+      this.props.extendMap(lat, lng, place);
 
       //add event listner
       google.maps.event.addListener(marker,'click',function() {          
           marker.setVisible(false);
-          this.gotoLocation(); //zoom into the location
+          this.gotoLocation(marker); //zoom into the location
       }.bind(this)); 
+
+      return marker;
 
   },
 
-  //TODO do in the server
-  decodeLoc: function () {
-    //this.setState({stopAdding: true});
-    //get the place
-    var address = this.props.loc; 
+  randomRadius: function () {
+    return Math.floor(Math.random()*2000); 
+  },
+
+  decodeTarget: function () { 
+    
+    //var address = this.props.loc; 
     var service = new google.maps.places.PlacesService(this.props.map);        
-    var request = {query: address};
-    //make an async call to decode the address, after which a
-    //callback functin is make to add the marker
-    service.textSearch(request, function (results, status) {
+    var request = {location: this.state.currentMarker.getPosition(), 
+                   radius: this.randomRadius(), 
+                   query: "Department Store"}; //TODO test for now
+
+    service.nearbySearch(request, function (results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-          this.setState({currentMarker: this.addMarker(results[0])});
+          this.setState({gem: this.addMarker(results[0])});
         }
     }.bind(this)); 
   },
    
   //this function is called when location is clicked
-  gotoLocation: function () {
+  gotoLocation: function (marker) {
     
-    var marker = this.state.currentMarker;
     var point = marker.getPosition();
     //TODO hard code for now
     this.props.map.setZoom(15);
@@ -99,7 +126,7 @@ var Marker = React.createClass({
             path: [op, p],
             strokeColor: "#FF0000",
             strokeOpacity: 1.0,
-            strokeWeight: 10,
+            strokeWeight: 5,
             map: that.props.map
           });
         };
@@ -157,7 +184,8 @@ var Marker = React.createClass({
 
             streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
           } else {
-            console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters")
+            //TODO doesn't work, investigate
+            this.setState({markerStatus: "Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters"});
           }
           
         }
@@ -170,7 +198,7 @@ var Marker = React.createClass({
 
   render: function () {
     //return null since not creating new html elements
-    return null;
+    return <div>{this.state.markerStatus}</div>;
   }
 
 }); 
@@ -200,9 +228,8 @@ var Map = React.createClass({
   createMap: function () {
     
     var mapOptions = {
-          //center: new google.maps.LatLng(41.9, 12.5),
-          //zoom: 4
-        };
+          zoom: 8
+    };
 
     //create map object 
     var map = new google.maps.Map(this.refs.map_canvas.getDOMNode(), mapOptions);
@@ -232,18 +259,27 @@ var Map = React.createClass({
   
   },
 
-  resizeMap: function (bounds, lat, lng) {
+  resizeMap: function (lat, lng, place) {
+
+    var map = this.state.map;
+    var bounds;
+
+    if (place != null)
+      bounds = new google.maps.LatLngBounds(); //reset
+    else
+      bounds = this.state.mapBounds;
+
     if(lat !== undefined && lng !== undefined)
 	    bounds.extend(new google.maps.LatLng(lat, lng));
 
-    var map = this.state.map;
 	  map.fitBounds(bounds);
 	  map.setCenter(bounds.getCenter());
 
-    if (map.getZoom() > 8)
-      map.setZoom(8);
+    //TODO initial map zooming is not working properly
+    if (map.getZoom() > 15)
+      map.setZoom(15);
 
-    this.setState({map: map});
+    this.setState({map: map, mapBounds: bounds});
   },
 
   toggleStreetView: function () {
@@ -266,33 +302,27 @@ var Map = React.createClass({
        this.resetView();
     
     var markers;
+
     if(this.state.map) {
-      //
       markers = <Marker loc={this.props.loc} lat={this.props.lat} lng={this.props.lng}
                         renderQuestions = {this.props.renderQuestions}
-                        proceed = {this.props.resetMap}
+                        nextStop = {this.props.nextStop}
                         map={this.state.map} 
                         sendMarkers={this.sendMarkers}
                         panorama={this.state.panorama} 
                         extendMap={this.resizeMap} 
-                        bounds={this.state.mapBounds} />;
+                        />;
     } else {
-
       markers = null;
-
     }
 
     //I'm just puting markers there in order to have render on the map
     var style = {height: "500px", width: "800px"};
-    var button = <div id="panel" >
-                    <input type="button" value="Toggle Street View" onClick={this.toggleStreetView}/>
-                 </div>;
-    return  <div>
-              {button}
-              <div style={style} ref="map_canvas">
-                {markers}
-              </div>
-            </div>;
+    //var button = <div id="panel" >
+    //                <input type="button" value="Toggle Street View" onClick={this.toggleStreetView}/>
+    //             </div>;
+
+    return <div style={style} ref="map_canvas"> {markers} </div>;
   }
 
 });
