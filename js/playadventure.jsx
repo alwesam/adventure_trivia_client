@@ -12,11 +12,17 @@ var PlayAdventure = React.createClass({
   },
 
   componentDidMount: function () {
+    //TODO ajax request to details including questions
+    //off the challenge ID
+    //questions and riddles
 
   },
 
   proceedToNextQuestion: function (value) {
     console.log("incrementing question>>>>>>>>>>>>>>>>>>>>>>>");
+    //resetMap exits panorama view
+    //show questions hide questions
+    //nextStop is the question to be displayed
     this.setState({resetMap: true, showQuestions: false, nextStop: value});
   },
 
@@ -26,6 +32,7 @@ var PlayAdventure = React.createClass({
     if (this.state.current < this.props.challenges.length-1){
       //get questions from ajax and answers
       console.log("incrementing stage>>>>>>>>>>>>>>>>>>>>>>>");
+      console.log("nextStop"+this.state.nextStop);
       this.setState({current: this.state.current + 1});
       //reset map and hide questions
       this.setState({showQuestions: false, resetMap: true});

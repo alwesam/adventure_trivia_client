@@ -4,7 +4,7 @@ var Marker = React.createClass({
     return {currentMarker: null, 
       gems: [], gem: null, 
       nextStop: null, 
-      markerStatus: "",
+      currentBounds: null,
       currentLoc: ""};
   },
 
@@ -12,7 +12,7 @@ var Marker = React.createClass({
   componentDidMount: function () {
     this.setState({currentLoc: this.props.loc});
     //dirty hack to get the map bounds working
-    this.props.extendMap(this.props.lat+0.01, this.props.lng+0.01);
+    this.props.extendMap(null, this.props.lat+0.01, this.props.lng+0.01);
   },
 
   componentWillReceiveProps: function (nextProps) {
@@ -22,8 +22,9 @@ var Marker = React.createClass({
     console.log("current stop>>>>>: "+this.props.nextStop);
     console.log("next stop>>>>>: "+nextProps.nextStop);
 
-    if (nextProps.loc != this.props.loc)
+    if (nextProps.loc != this.props.loc) {
       this.setState({currentLoc: nextProps.loc});
+    }
   
     if (nextProps.nextStop != this.props.nextStop &&
         nextProps.nextStop.length >0 )
@@ -32,8 +33,12 @@ var Marker = React.createClass({
 
   //once state with current location, place it on the map
   componentDidUpdate: function (prevProps, prevState) {
-    if(prevState.currentLoc != this.state.currentLoc)
+    if(prevState.currentLoc != this.state.currentLoc) {
       this.setState({currentMarker: this.addMarker(null)});
+      //establish a new bound
+      console.log("establishing a new bound at >>>>>>>>>>>>>>>>"+this.props.loc);
+      this.setState({currentBounds: new google.maps.LatLngBounds(new google.maps.LatLng(this.props.lat, this.props.lng))});
+    }
     else { 
       if(prevState.nextStop != this.state.nextStop)
         this.decodeTarget();
@@ -46,13 +51,19 @@ var Marker = React.createClass({
       var lat  = place.geometry.location.lat();  
       var lng  = place.geometry.location.lng(); 
       var name = place.formatted_address; 
+      var bounds = this.state.currentBounds;
      }
      else {
       var lat  = this.props.lat;  
       var lng  = this.props.lng; 
       var name = this.props.loc; 
+      var bounds = null; //starting fresh
      }
 
+     //when we change locations, then we have a bouncing
+     //marker that says click me
+     //when we leave to the next location, the first marker
+     //icon will be a flag (unclickable)
      var marker = new google.maps.Marker({
              map: this.props.map,
              position: new google.maps.LatLng(lat, lng),
@@ -65,7 +76,8 @@ var Marker = React.createClass({
 
      //extend map as markers are added
      //TODO do in the map check!!!!!!!!
-     this.props.extendMap(lat, lng, place);
+     this.props.extendMap(bounds, lat, lng);
+
 
      //add event listner
      google.maps.event.addListener(marker,'click',function() {          
@@ -189,7 +201,8 @@ var Marker = React.createClass({
             streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
           } else {
             //TODO doesn't work, investigate
-            this.setState({markerStatus: "Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters"});
+            //this.setState({markerStatus: "Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters"});
+            console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters");
           }
           
         }
@@ -202,7 +215,7 @@ var Marker = React.createClass({
 
   render: function () {
     //return null since not creating new html elements
-    return <div>{this.state.markerStatus}</div>;
+    return null;
   }
 
 }); 
@@ -264,19 +277,22 @@ var Map = React.createClass({
   
   },
 
-  resizeMap: function (lat, lng, place) {
+  resizeMap: function (inbounds, lat, lng) {
 
     var map = this.state.map;
     var bounds;
 
-    //TODO fix!!!!
-    //if (place != null)
-    //  bounds = new google.maps.LatLngBounds(); //reset
-    //else
+    if (inbounds != null){
+      console.log("extending locally");
+      console.log(inbounds);
+      bounds = inbounds 
+    }
+    else{
+      console.log("extending globally");
       bounds = this.state.mapBounds;
+    }
 
-    if(lat !== undefined && lng !== undefined)
-	    bounds.extend(new google.maps.LatLng(lat, lng));
+	  bounds.extend(new google.maps.LatLng(lat, lng));
 
 	  map.fitBounds(bounds);
 	  map.setCenter(bounds.getCenter());
@@ -288,7 +304,8 @@ var Map = React.createClass({
     console.log("zooooooooooooooming");
     console.log("zoom level "+map.getZoom());
 
-    this.setState({map: map, mapBounds: bounds});
+    if(inbounds == null)
+      this.setState({map: map, mapBounds: bounds});
   },
 
   toggleStreetView: function () {
