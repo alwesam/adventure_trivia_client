@@ -6,6 +6,7 @@ var PlayAdventure = React.createClass({
              challengeID: 0,
              showQuestions: false, 
              nextStop: "",
+             hearts: 3,
              resetMap: false, 
              finalChallenge: false }
   },
@@ -43,6 +44,10 @@ var PlayAdventure = React.createClass({
         }); 
   },
 
+  minusheart: function () {
+    this.setState({hearts: this.state.hearts-1});
+  },
+
   render: function () {
     ///////TODO move to states
     //at least I got this correct
@@ -55,17 +60,20 @@ var PlayAdventure = React.createClass({
     var quiz      = challenge.questions;
 
     //riddle
-    var riddle     = challenge.riddle.content;
-    var hint = challenge.riddle.hint;
+    var riddle   = challenge.riddle.content;
+    var hint     = challenge.riddle.hint;
     var solution = challenge.riddle.solution; 
 
     //TODO improve logic once data is retrieved from server
     var quizForm = <Quiz onComplete={this.proceedToNextLocation} 
                          questionDone={this.proceedToNextQuestion} 
                          showQuestions={this.state.showQuestions}
+                         hearts={this.state.hearts}
+                         minusheart={this.minusheart}
                          loc={loc} 
                          quiz ={quiz} 
                          clue={riddle} 
+                         clueHint={hint} 
                          clueAns={solution}/>;
 
     var mapForm = <Map loc={loc} lat={lat} lng={lng} 
@@ -74,6 +82,14 @@ var PlayAdventure = React.createClass({
                        resetMap={this.state.resetMap} />;
 
     var monsterForm = <Monster />;
+
+    var arr=[];
+    for (var i = 0; i< this.state.hearts; i++)
+      arr.push('');
+
+    //TODO heart instead of ruby
+    var lives = arr.map(function (i) {
+            return <img src="img/ruby.png" height="35" width="35" /> });
 
     //here a giant if-else statement with showQuestions
 
@@ -87,6 +103,7 @@ var PlayAdventure = React.createClass({
       //here slide question form infront of map or along with it
       return <div><h1>{this.props.name}</h1>
               <div className="question-map-box">
+                <div className="lives-box">{lives}</div>
                 <div className="question-box">{quizForm}</div>
                 <div >{mapForm}</div>
               </div>

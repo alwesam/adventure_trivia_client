@@ -13,41 +13,39 @@ var Monster = React.createClass({
   },
 
   render: function(){
-    var monster = <h1>"Arrrgh... prepare for combat"</h1>;
+    var monster = <h1>You must choose, but choose wisely</h1>;
+
+    var vim   = <img width="200" height="200" border="5" src="img/vim.png" onClick={this.gameWon}/>;
+    var emacs = <img width="200" height="200" border="5" src="img/emacs.png" onClick={this.gameLost}/>;
+
     //Temp
-    var link = <h2><a href="#" onClick={this.gameWon}>OK you won</a></h2>;
+    //var link = <h2><a href="#" onClick={this.gameWon}>OK you won</a></h2>;
     ////
+    
     var finalPage = <FinalPage />;
     var finalPageLost = <FinalPageLost />;
+
     if (this.state.won)
       return <div>{finalPage}</div>;
     else if (this.state.loss)
       return <div>{finalPageLost}</div>;
     else
-      return <div>{monster} {link}</div>; 
+      return <div>
+              {monster}
+              <div className="container">
+                <div className="row">
+                  <div className="col-md-6">
+                    {vim}
+                  </div>
+                  <div className="col-md-6">
+                   {emacs}
+                  </div>
+                </div>
+              </div>
+             </div>; 
   }
 
 });
-
-
-var Review = React.createClass({
-  getInitialState: function () {
-    return {rating: 0};
-  },
-    
-  //ask an expert in react
-  rate: function () {
-    this.setState({rating: this.refs.starInput.getDOMNode().value});
-   // this.setState({ratingText: this.state.rating+" stars"});
-    this.props.text(this.state.rating);
-  },
-
-  render: function () {
-    return  <input type="radio" name="rating" value={this.props.value} ref="starInput" onChange={this.rate}/>
-  }
-
-});
-
 
 var FinalPage = React.createClass({
 
@@ -77,7 +75,9 @@ var FinalPage = React.createClass({
                    <input type="radio" name="rating" onChange={this.rate.bind(null,5)}/><i className={this.state.rating >= 5? "star-on":"star-off"}></i>
                  </span>;
 
+    //TODO 
     var inviteFriends = <h4><a href="#">Invite your friends</a></h4>;
+    var comments = <div> Comments </div>
 
     return <div>
             <h1>Congratulations!</h1>
@@ -85,6 +85,7 @@ var FinalPage = React.createClass({
             <div>{stars}</div>
             <div><strong>{this.state.ratingText}</strong></div>
             {inviteFriends}
+            {comments}
            </div>; 
   }
 });
@@ -99,4 +100,5 @@ var FinalPageLost = React.createClass({
       {image}
       </div>); 
   }
+
 });

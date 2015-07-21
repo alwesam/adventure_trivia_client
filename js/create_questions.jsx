@@ -88,14 +88,13 @@ var CreateQuestion = React.createClass({
                                answer: this.state.answer, 
                                answers: this.state.choices});
   },
+
   //TODO ok this is messy and it causes JS errors, but it works
   isReady: function () {
     return (this.state.answer.length > 0 && this.state.choices.length > 0) 
   },
 
   render: function () {
-
-    //var submitQuestion = <div><input type="submit" value="Submit Question" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
 
     var question = <div><input type="text" 
                            placeholder="Enter Question" 
@@ -140,9 +139,21 @@ var CreateQuestionsContainer = React.createClass({
     this.props.addToChallenge(this.state.questions);
   },
 
-  //TODO ok this is messy and it causes JS errors, but it works
   isReady: function () {
-    return true; //for now
+
+    var ready = true;
+    //dirty fix for now
+    if (this.state.questions.length >0) {
+      this.state.questions.forEach(function(q) {
+        if (q.answer == "" || q.answer == undefined || q.answer == null){
+          ready = false; 
+        }
+      }.bind(this));
+    }
+    else
+      ready = false;
+    
+    return ready;
   },
 
   render: function () {
@@ -150,7 +161,7 @@ var CreateQuestionsContainer = React.createClass({
     for(var i=0; i<this.state.numQuestions; i++)
       arr.push('');
 
-    var submitQuestions= <div><input type="submit" value="Submit Question" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
+    var submitQuestions= <div><input type="submit" value="Create Question(s)" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
 
     console.log("array of questions length "+arr.length);
 

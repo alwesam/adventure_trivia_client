@@ -11,6 +11,8 @@ var Marker = React.createClass({
   //for first time rendering
   componentDidMount: function () {
     this.setState({currentLoc: this.props.loc});
+    //dirty hack to get the map bounds working
+    this.props.extendMap(this.props.lat+0.01, this.props.lng+0.01);
   },
 
   componentWillReceiveProps: function (nextProps) {
@@ -34,12 +36,8 @@ var Marker = React.createClass({
       this.setState({currentMarker: this.addMarker(null)});
     else { 
       if(prevState.nextStop != this.state.nextStop)
-        this.addStop();
+        this.decodeTarget();
     }
-  },
-
-  addStop: function (){
-    this.decodeTarget();
   },
 
   addMarker: function (place) {
@@ -55,42 +53,38 @@ var Marker = React.createClass({
       var name = this.props.loc; 
      }
 
+     var marker = new google.maps.Marker({
+             map: this.props.map,
+             position: new google.maps.LatLng(lat, lng),
+             title: name 
+     });
 
-      var marker = new google.maps.Marker({
-              map: this.props.map,
-              position: new google.maps.LatLng(lat, lng),
-              title: name 
-      });
+     marker.infoBox = new google.maps.InfoWindow({
+       content: name 
+     });
 
-      marker.infoBox = new google.maps.InfoWindow({
-        content: name 
-      });
+     //extend map as markers are added
+     //TODO do in the map check!!!!!!!!
+     this.props.extendMap(lat, lng, place);
 
-      //extend map as markers are added
-      //TODO do in the map check!!!!!!!!
-      this.props.extendMap(lat, lng, place);
+     //add event listner
+     google.maps.event.addListener(marker,'click',function() {          
+         marker.setVisible(false);
+         this.gotoLocation(marker); //zoom into the location
+     }.bind(this)); 
 
-      //add event listner
-      google.maps.event.addListener(marker,'click',function() {          
-          marker.setVisible(false);
-          this.gotoLocation(marker); //zoom into the location
-      }.bind(this)); 
+     return marker;
 
-      return marker;
-
-  },
-
-  randomRadius: function () {
-    return Math.floor(Math.random()*2000); 
   },
 
   decodeTarget: function () { 
     
-    //var address = this.props.loc; 
+    var landmark = this.state.nextStop; 
+    console.log("landmark passed is: "+landmark);
     var service = new google.maps.places.PlacesService(this.props.map);        
     var request = {location: this.state.currentMarker.getPosition(), 
-                   radius: this.randomRadius(), 
-                   query: "Department Store"}; //TODO test for now
+                   radius: 5000, //5 km 
+                   types: ["night_club"]}; //TODO test for now
 
     service.nearbySearch(request, function (results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -144,12 +138,22 @@ var Marker = React.createClass({
           var _GREEN = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
           var _INDIANA = 'img/indiana.jpg';
 
+          //var _RUBY = 'img/ruby.jpg';
+          //http://stackoverflow.com/questions/7842730/change-marker-size-in-google-maps-v3
+          var _RUBY = new google.maps.MarkerImage(
+              "img/ruby.png",
+              null, /* size is determined at runtime */
+              null, /* origin is 0,0 */
+              null, /* anchor is bottom center of the scaled image */
+              new google.maps.Size(30, 30)
+          );
+
           var target = new google.maps.Marker({
               position: new google.maps.LatLng(newLat, newLng),
               //position: point,
               map: this.props.map,
               title: streetViewPanoramaData.location.description,
-              icon: _GREEN
+              icon: _RUBY
           });
           
           //drawLine(marker.getPosition(), target.getPosition());
@@ -218,6 +222,7 @@ var Map = React.createClass({
   },
 
   setMapBounds: function () {
+    //the main map bounds
     return new google.maps.LatLngBounds();
   },
 
@@ -228,7 +233,7 @@ var Map = React.createClass({
   createMap: function () {
     
     var mapOptions = {
-          zoom: 8
+          zoom: 12
     };
 
     //create map object 
@@ -264,9 +269,10 @@ var Map = React.createClass({
     var map = this.state.map;
     var bounds;
 
-    if (place != null)
-      bounds = new google.maps.LatLngBounds(); //reset
-    else
+    //TODO fix!!!!
+    //if (place != null)
+    //  bounds = new google.maps.LatLngBounds(); //reset
+    //else
       bounds = this.state.mapBounds;
 
     if(lat !== undefined && lng !== undefined)
@@ -278,6 +284,9 @@ var Map = React.createClass({
     //TODO initial map zooming is not working properly
     if (map.getZoom() > 15)
       map.setZoom(15);
+
+    console.log("zooooooooooooooming");
+    console.log("zoom level "+map.getZoom());
 
     this.setState({map: map, mapBounds: bounds});
   },
@@ -317,7 +326,8 @@ var Map = React.createClass({
     }
 
     //I'm just puting markers there in order to have render on the map
-    var style = {height: "500px", width: "800px"};
+    //TODO fix style to make it responsive
+    var style = {height: "500px", width: "1000px"};
     //var button = <div id="panel" >
     //                <input type="button" value="Toggle Street View" onClick={this.toggleStreetView}/>
     //             </div>;

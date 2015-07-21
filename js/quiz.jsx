@@ -36,16 +36,16 @@ var Question = React.createClass({
 var Quiz = React.createClass({
   getInitialState() {
     return {submittedData: null, 
-            correct: false, 
             questionIndex: 0,
+            hearts: 3,
+            gameOver: false,
             questionsCompleted: false,
-            solutions: {} };
+            warning: "",
+            solution: "" };
   },
 
   componentDidMount: function () {
-    
     //TODO here do an AJAX request to get questions
-  
   },
 
   componentDidUpdate: function (prevProps, prevState) {
@@ -55,13 +55,12 @@ var Quiz = React.createClass({
 
     if(prevState.submittedData === null && this.state.submittedData) {
 
+      this.setState({submittedData : null}); //reset to prevent resubmission
       if(this.checkAnswers()) {
-        this.setState({submittedData : null});
+        this.setState({warning: ""});
 
         if(this.state.questionIndex < this.props.quiz.length -1){
           //signal to map to move on to the next question
-          //this.questionSolved(); 
-          //advance to the nex question and clue
           this.setState({questionIndex: this.state.questionIndex+1});
         }
         else {
@@ -73,7 +72,12 @@ var Quiz = React.createClass({
       } //checking answers
       else {
         //TODO render it in HTML
-        console.log ("Incorrect Answer, Try again");
+        this.props.minusheart();
+        if(this.props.hearts == 1) //game over
+          this.setState({gameOver: true});
+        else {
+          this.setState({warning: "Incorrect Answer, Try Again"});
+        }
       }
 
     }//finished checking
@@ -85,13 +89,10 @@ var Quiz = React.createClass({
 
   //got it from stackoverflow
   makeid: function () {
-  
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
     for( var i=0; i < 10; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
-
     return text;
   },
 
@@ -99,44 +100,28 @@ var Quiz = React.createClass({
     //here call playadventure which calls map and marker to move into the next
     //question 
     console.log("question solved>>>>>>>>>>>>>>>");
+    console.log("next quesiton??????????????  "+this.props.quiz[this.state.questionIndex].content);
     //TODO do some work here for pattern matching
-    //this.props.questionDone("Kingston, Ontario, Canada");
-    //this.props.questionDone(this.state.questionIndex);
-    this.props.questionDone(this.makeid());
+    //this.props.questionDone(this.makeid());
+    this.props.questionDone(this.props.quiz[this.state.questionIndex].content);
   },
 
-  receiveSolutions: function(problem, solution) {
-    //solution is a single k/v pair {q : a}
-    //update the k/v array of the quiz accordingly
-    var s = this.state.solutions;
-    //update
-    s[problem] = solution;
-    this.setState({solutions: s }); 
+  receiveSolution: function(problem, solution) {
+    //TODO revise
+    if(problem === this.props.quiz[this.state.questionIndex].content)
+      this.setState({solution: solution }); 
     
   },
 
   checkAnswers: function () {
 
     //TODO do an AJAX request here with server to check answers
-    
-    //a little hack for now to reset resubmission
-    //this.setState({submittedData : null});
-
-    /***DOWN here willl be done on server side****/
-    //constructing the correct answers
-    //TODO comment out for testing
-    //var corr = {};
-    //this.props.quiz.map(function(q){corr[q.qtext]=q.ctext;});
-
-    //TODO comment out for testing
-    //for (var k in corr) {
-    //  if (this.state.solutions[k] === null || //ie doesn't exist or not selected 
-    //      this.state.solutions[k] != corr[k]) {
-    //    return false;
-    //  }
-    //}
-    
-    return true;
+    console.log("given solution "+this.state.solution);
+    console.log("correct solution "+this.props.quiz[this.state.questionIndex].answer);
+    if(this.state.solution === this.props.quiz[this.state.questionIndex].answer)
+      return true;
+    else
+      return false;
 
   },
 
@@ -148,11 +133,19 @@ var Quiz = React.createClass({
   solveClue: function () {
     var solution = this.refs.userInput.getDOMNode().value;
     //if solution is correct advance to next stage and next marker
-    if (solution === this.props.clueAns) {
-       this.setState({submittedData: null}) 
-       this.setState({solutions: {}}) 
+    if (solution.toUpperCase() === this.props.clueAns.toUpperCase()) {
+       this.setState({warning: ""});
+       this.setState({submittedData: null});
+       this.setState({solutions: {}});
        //signal to update to next location
        this.props.onComplete();
+    }
+    else {
+      this.props.minusheart();
+      if(this.props.hearts == 1) //game over
+        this.setState({gameOver: true});
+      else
+        this.setState({warning: "Incorrect, try again. Hint: "+this.props.clueHint}); 
     }
   },
 
@@ -164,7 +157,9 @@ var Quiz = React.createClass({
     var qtext = qObj.content; //return a string
     var atext = qObj.answers; //return an array of answer objects
 
-    var question = <Question solution={this.receiveSolutions} qtext={qtext} answers={atext} />;
+    var question = <Question solution={this.receiveSolution} qtext={qtext} answers={atext} />;
+
+    var warning_style = {color: "red"};
 
     var quizform = <div>
              <h3>{this.props.loc}</h3>
@@ -172,16 +167,30 @@ var Quiz = React.createClass({
                {question}
                <input type="submit" value="Submit"/>
              </AutoForm>
+             <div style={warning_style}>
+              {this.state.warning}
+             </div>
           </div>;
 
-    var paragraph = <div> This is a description and instructions to the adventure </div>;
+    var paragraph = <div> Find a ruby, click on it and solve the question </div>;
 
+    var gameover = <div> GAME OVER </div>
+
+    //var riddle = this.props.loc ? <h3> Solve riddle to move on to final challenge</h3> :
+    //                              <h3> Solve riddle to move on to next destination</h3>;
+    var riddle = <h4> Solve riddle to move on to next destination</h4>;
+
+    if(this.state.gameOver)
+      return gameover;
     if (this.state.questionsCompleted){
       return <div>
-             <h3>{this.props.loc}</h3>
+             <div>{riddle}</div> 
              <div><strong>{this.props.clue}</strong></div>
-             <input type="text" ref="userInput" />
-             <input type="submit" value="Take me to the next quiz" onClick={this.solveClue}/>
+             <div><input type="text" ref="userInput" /></div>
+             <input type="submit" value="Take me to the next adventure" onClick={this.solveClue}/>
+             <div style={warning_style}>
+              {this.state.warning}
+             </div>
           </div>;
     }
     else if (this.props.showQuestions) {

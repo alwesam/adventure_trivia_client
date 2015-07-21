@@ -38,10 +38,14 @@ var Adventure = React.createClass({
       return <PlayAdventure include_final={true} name= {this.props.name} challenges={this.state.challenges} />
     }
     else if (this.state.detailsFetched) {
-      return <div>
-               <h3>{this.props.name}</h3>
-               <p>{this.state.description}</p>
-               <button href="#" onClick={this.startAdventure}>Play</button>
+      return <div className="row hightlight">
+               <div className="col-md-6">
+                 <h3>{this.props.name}</h3>
+               </div>
+               <div className="col-md-6">
+                 <h4>{this.state.description}</h4>
+               </div>
+               <button className="btn btn-primary" href="#" onClick={this.startAdventure}>Play</button>
              </div>;
     }
     else {
@@ -87,6 +91,7 @@ var Adventures = React.createClass({
     var adventures = this.state.adventures.map(function(a) {
       return <Adventure name={a.title} id={a.id} start={this.start} />; 
     }.bind(this));
+
     var spinnerDisplay = this.state.showSpinner ? "block" : "none";
     var spinnerStyle   = {display: spinnerDisplay};
     //TODO Problem here
@@ -96,7 +101,7 @@ var Adventures = React.createClass({
                             challenges={this.state.challenges} /></div>;
     }
     else {
-      return <div className="text-center">
+      return <div>
                <div style={spinnerStyle}>Loading...</div>
                {adventures}
              </div>;
