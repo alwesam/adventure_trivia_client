@@ -1,37 +1,35 @@
 var MakeAnswers = React.createClass({
 
   getInitialState: function(){
-    return {atext: "", correct: false, corrrectAnswer: "", logAnswer: false};
+    return {atext: "", checked: false, logAnswer: false};
   },
 
   componentDidUpdate: function (prevState) {
-    //pass the answer
-    if(this.state.logAnswer){
+    if(this.state.logAnswer)
       this.pass();
-      console.log("updating answers "+this.state.logCheck);}
   },
 
   pass: function () {
-    console.log("passing answer");
     this.setState({logAnswer: false}); 
-    this.props.passAnswers(this.props.index, this.state.correctAnswer, this.state.atext);
+    this.props.passAnswers(this.props.index, this.state.atext, this.state.checked);
   },
 
   answerInput: function () {
     this.setState({atext: this.refs.answerInput.getDOMNode().value}); 
+    
+    //TODO a hack to fix in case answer text is changed but not selection
+    if (this.refs.userSelect.getDOMNode().checked)
+      this.props.passCorrectAnswer(this.refs.answerInput.getDOMNode().value);
+
     this.setState({logAnswer: true});
   },
 
   checkSelect: function () {
-    this.setState({correct: this.refs.userSelect.getDOMNode().checked}); 
-    //TODO review code
-    this.setState({correctAnswer: this.refs.answerInput.getDOMNode().value}); 
-    console.log("selected value "+this.refs.answerInput.getDOMNode().value );
-    this.setState({logAnswer: true});
+    if (this.refs.userSelect.getDOMNode().checked)
+      this.props.passCorrectAnswer(this.refs.answerInput.getDOMNode().value);
   },
 
   render: function () {
-    console.log("rendering render");
     var answer = <input type="text" placeholder="Enter Answer" ref="answerInput" onChange={this.answerInput}/>;  
     var trueOrNot = <input type="radio" name={this.props.question} ref="userSelect" onChange={this.checkSelect} />;  
     return <div>{answer}&nbsp;&nbsp;<span>{trueOrNot}</span></div>;
@@ -55,13 +53,22 @@ var CreateQuestion = React.createClass({
       this.pass(); 
   },
 
-  addToQuestion: function (index, correct, choice) {
-    console.log("adding answer to question index: "+index);
+  updateCorrectAnswer: function (value) {
+    this.setState({answer: value});
+    this.setState({log: true});
+  },
+
+  addToQuestion: function (index, choice, checked) {
+
     var choices = this.state.choices;
+
+    //var bool = (this.state.answer == choice) ? true : false;
+    ///TODO fix
+    //choices[index] = {content: choice, correct: checked};
+    
     choices[index] = {content: choice};
-    //choices.push(choice);
+    
     this.setState({choices: choices});
-    this.setState({answer: correct});
     this.setState({log: true});
   },
 
@@ -74,24 +81,12 @@ var CreateQuestion = React.createClass({
 
   //pass a prop
   pass: function () {
-    console.log("passing question");
+    //console.log("passing question");
     this.setState({log: false});
     this.props.addToQuestions(this.props.index,
                               {content: this.state.qtext,
                                answer: this.state.answer, 
                                answers: this.state.choices});
-  },
-
-  //TODO remove
-  onSubmit: function () {
-    this.props.addToQuestions({content: this.state.qtext,
-                               answer: this.state.answer, 
-                               answers: this.state.choices});
-  },
-
-  //TODO ok this is messy and it causes JS errors, but it works
-  isReady: function () {
-    return (this.state.answer.length > 0 && this.state.choices.length > 0) 
   },
 
   render: function () {
@@ -105,7 +100,8 @@ var CreateQuestion = React.createClass({
     var answers = ['','',''].map(function (answer, index) {
       return (
         <div key={index}>
-          <MakeAnswers question={this.state.qtext} index={index} passAnswers={this.addToQuestion} />
+          <MakeAnswers question={this.state.qtext} index={index} passAnswers={this.addToQuestion}
+                                                                 passCorrectAnswer={this.updateCorrectAnswer} />
         </div>
       );
     }.bind(this));
@@ -130,12 +126,28 @@ var CreateQuestionsContainer = React.createClass({
   addToContainer: function (index, question_obj) {
     var arr = this.state.questions;
     arr[index] = question_obj; 
+    console.log("question object content is :"+question_obj.content);
+    console.log("question object answer is :"+question_obj.answer);
+    console.log("question object answer0 content is :"+question_obj.answers[0].content);
+    //console.log("question object answer0 boolean is :"+question_obj.answers[0].correct);
+    console.log("question object answer1 content is :"+question_obj.answers[1].content);
+    //console.log("question object answer1 boolean is :"+question_obj.answers[1].correct);
+    console.log("question object answer2 content is :"+question_obj.answers[2].content);
+    //console.log("question object answer2 boolean is :"+question_obj.answers[2].correct);
     this.setState({questions: arr});
   },
 
   onSubmit: function () {
     //pass an array of objects
     console.log("passing an arry of objects"+this.state.questions);
+    console.log("question object content is :"+this.state.questions[0].content);
+    console.log("question object answer is :"+this.state.questions[0].answer);
+    console.log("question object answer0 content is :"+this.state.questions[0].answers[0].content);
+    //console.log("question object answer0 boolean is :"+this.state.questions[0].answers[0].correct);
+    console.log("question object answer1 content is :"+this.state.questions[0].answers[1].content);
+    //console.log("question object answer1 boolean is :"+this.state.questions[0].answers[1].correct);
+    console.log("question object answer2 content is :"+this.state.questions[0].answers[2].content);
+    //console.log("question object answer2 boolean is :"+this.state.questions[0].answers[2].correct);
     this.props.addToChallenge(this.state.questions);
   },
 
@@ -165,7 +177,6 @@ var CreateQuestionsContainer = React.createClass({
 
     console.log("array of questions length "+arr.length);
 
-    //test TODO >>>>>>>>>>>>>>>>>>>>>>>>>.
     var questions = arr.map(function (question, index){
       return (
           <div key={index}>
