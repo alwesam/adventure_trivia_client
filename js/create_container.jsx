@@ -71,17 +71,34 @@ var CreateAdventure = React.createClass({
 
     switch (this.state.stage) {
       case 0:
-        return <CreateOverview pass={this.receiveOverview} />;
+        return <div className="hompage-box"> 
+                 <div className="homepage-actions">  
+                  <div className="row"> 
+                   <div className="col-md-4 col-md-offset-4">
+                     <CreateOverview pass={this.receiveOverview} />
+                   </div>
+                  </div>
+                 </div>
+              </div>;
         break;
       case 1:
+        return <div className="hompage-box"> 
+                 <div className="homepage-actions">  
+                  <div className="row"> 
+                   <div className="col-md-4 col-md-offset-4">
+                     <CreateChallenges locs={this.state.locations} pass={this.receiveChallenges} />
+                   </div>
+                  </div>
+                 </div>
+              </div>;
         //pass param to challenges --> list of locations
-        return <CreateChallenges locs={this.state.locations} pass={this.receiveChallenges} />; //call challenges container 
+        //return <CreateChallenges locs={this.state.locations} pass={this.receiveChallenges} />; //call challenges container 
         break;
       case 2: 
         return <div>{includeGame} {submitButton}</div>;
         break;
       case 3: 
-        return <div className="container"><Adventures /></div>;
+        return <div><Adventures /></div>;
         break;
     }
 

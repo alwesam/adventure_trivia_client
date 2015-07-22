@@ -1,7 +1,37 @@
 /*html, body, .row, .col-md-9, #map_canvas {height: 100%;}*/
 html, body {height: 100%;}
 
-.lives-box {
+.homepage-actions {
+  margin-top: 15%;
+}
+
+.homepage-box {
+  margin-top: 5%;
+}
+
+.adventures-container {
+  /*background-color: #E6BC69;*/
+}
+
+.adventure-item-details {
+  background-color: #E6BC69;
+}
+
+.adventures-list {
+  margin-left: 5%;
+}
+
+.adventure-item h3 a {
+  text-decoration: none;
+  color: red;
+}
+
+.adventure-item h3 a:hover {
+  text-decoration: none;
+}
+
+.name-box {
+  color: green;
   position: absolute;
   z-index: 400;
   top: 0px;
@@ -9,6 +39,16 @@ html, body {height: 100%;}
   padding: 20px;
   border-radius: 20px;
   left: 300px;
+}
+
+.lives-box {
+  position: absolute;
+  z-index: 400;
+  top: 300px;
+  background-color: rgba(255,255,255,.8);
+  padding: 20px;
+  border-radius: 20px;
+  left: 500px;
 }
 
 .question-box {

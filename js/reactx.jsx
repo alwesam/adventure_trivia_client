@@ -3,54 +3,53 @@ var Adventure = React.createClass({
 
   getInitialState: function () {
     return {description: "",
-            play       : false,
-            challenges      : [],
             detailsFetched: false}
   },
 
-  //TODO don't fetch the whole thing at once
   fetchDetails: function () {
-    $.ajax({
-      url: "http://localhost:3000/adventures/"+this.props.id+".json",
-      method: "GET",
-      success: function(data){
-        console.log("here are the details of adventure >>>>>>>>>>>>>>>>>");
-        console.log(data);
-        this.setState({
-          description: data.description,
-          challenges: data.challenges,
-          detailsFetched: true
-        }); 
-        console.log(this.state.challenges);
-      }.bind(this)
-    });
+      this.setState({
+        detailsFetched: true
+      }); 
   },
 
   //TODO review code
   startAdventure: function () {
-    //this.setState({play: true});
-    this.props.start(this.props.name, this.state.challenges);
+    this.props.start(this.props.name, this.props.id);
+  },
+
+  hideAdventure: function () {
+    this.setState({detailsFetched: false});
   },
 
   render: function () {
-    if (this.state.play) {
-      //TODO need to flush the whole DOM and start again with a new page
-      return <PlayAdventure include_final={true} name= {this.props.name} challenges={this.state.challenges} />
-    }
-    else if (this.state.detailsFetched) {
-      return <div className="row hightlight">
-               <div className="col-md-6">
-                 <h3>{this.props.name}</h3>
-               </div>
-               <div className="col-md-6">
-                 <h4>{this.state.description}</h4>
-               </div>
-               <button className="btn btn-primary" href="#" onClick={this.startAdventure}>Play</button>
-             </div>;
+
+    var arr=[];
+    for (var i = 0; i< parseInt(this.props.rating); i++)
+      arr.push('');
+
+    //TODO star instead of ruby
+    if(this.props.rating > 0)
+      var stars = arr.map(function (i) {
+              return <img src="img/ruby.png" height="30" width="30" /> });
+    else
+      var stars = <h4>Not Rated</h4>
+
+    if (this.state.detailsFetched) {
+      return <div className="row adventure-item-details">
+                <div className="col-md-6">
+                  <h3>{this.props.name}</h3>
+                  <div>{stars}</div>
+                </div>
+                <div className="col-md-6">
+                  <h4>{this.props.description}</h4>
+                  <button className="btn btn-primary" href="#" onClick={this.startAdventure}>Play</button>
+                  <button className="btn btn-primary" href="#" onClick={this.hideAdventure} >Hide</button>
+                </div>
+              </div>;
     }
     else {
-      return <div>
-              <h3><a href="#" onClick={this.fetchDetails}> {this.props.name}</a></h3>
+      return <div className="adventure-item">
+               <h3><a href="#!" onClick={this.fetchDetails}> {this.props.name}</a></h3>
              </div>;
     }
   }
@@ -60,9 +59,9 @@ var Adventure = React.createClass({
 var Adventures = React.createClass({
   getInitialState: function () {
     return {adventures: [], 
+            passed_up_id: null, //not ideal, this 
             startAdventure: false,
             title: "",
-            challenges: '',
             showSpinner: true}
   },
 
@@ -82,28 +81,39 @@ var Adventures = React.createClass({
   },
 
   //TODO, review this code looks a bit prolematic
-  start: function (title, challenges) {
-    this.setState({startAdventure: true, title: title, challenges: challenges}); 
+  start: function (title, id) {
+     this.setState({startAdventure: true, title: title,
+                    passed_up_id: id }); 
   },
 
   render: function () {
     
     var adventures = this.state.adventures.map(function(a) {
-      return <Adventure name={a.title} id={a.id} start={this.start} />; 
+          return <Adventure name={a.title} 
+                            id={a.id} 
+                            description={a.description} 
+                            rating={a.average_rating} 
+                            start={this.start} />; 
     }.bind(this));
 
     var spinnerDisplay = this.state.showSpinner ? "block" : "none";
     var spinnerStyle   = {display: spinnerDisplay};
-    //TODO Problem here
+    
     if (this.state.startAdventure) {
-      return <div className="text-center"><PlayAdventure include_final={true}
+      return <PlayAdventure include_final={true}
+                            adventure_id={this.state.passed_up_id}
                             name= {this.state.title} 
-                            challenges={this.state.challenges} /></div>;
+                             />;
     }
-    else {
+    else { //render a list
       return <div>
-               <div style={spinnerStyle}>Loading...</div>
-               {adventures}
+               <div style={spinnerStyle} className="text-center">
+                 <h2>Loading...</h2>
+               </div>
+               <div className="adventures-list">
+                <h2>Choose Your Adventure</h2>
+                {adventures}
+               </div>
              </div>;
     }
   }
@@ -125,16 +135,19 @@ var HomePage = React.createClass({
 
   render: function () {
 
-    var homePage = <div className="text-center container">
-                     <h1>Welcome to Adventure Trivia</h1>
-                     <h3><a href="#" onClick={this.create}>Create an Adventure</a></h3>
-                     <h3><a href="#" onClick={this.play}>Play an Adventure</a></h3>
+    var homePage = <div className="text-center homepage-box">
+                       <h1>Welcome to Adventure Trivia</h1>
+                    <div className="homepage-actions">
+                       <h3><a href="#" onClick={this.create}>Create an Adventure</a></h3>
+                       <h3><a href="#" onClick={this.play}>Play an Adventure</a></h3>
+                    </div>
                    </div>;
 
     if (this.state.createAdventure)
-      return <div className="container"><CreateAdventure /></div>;
+      //define styling for all inputs, textareas and buttons
+      return <div className="container-fluid"> <CreateAdventure /></div>;
     else if (this.state.playAdventure)
-      return <div className="container"><Adventures /></div>;
+      return <div> <Adventures /> </div>;
     else
       return homePage;
 
@@ -144,7 +157,6 @@ var HomePage = React.createClass({
 var initialize = function () {
   //for now
   React.render(<HomePage />, document.getElementById("adventure"));
-  //React.render(<FinalPage />, document.getElementById("adventure"));
 }
 
 $(document).ready(function() {

@@ -5,6 +5,7 @@ var PlayAdventure = React.createClass({
     return { current: 0, 
              challengeID: 0,
              showQuestions: false, 
+             gameLoaded: false,
              nextStop: "",
              hearts: 3,
              resetMap: false, 
@@ -15,6 +16,18 @@ var PlayAdventure = React.createClass({
     //TODO ajax request to details including questions
     //off the challenge ID
     //questions and riddles
+    $.ajax({
+      url: "http://localhost:3000/adventures/"+this.props.adventure_id+".json",
+      method: "GET",
+      success: function(data){
+        console.log("here are the details of adventure >>>>>>>>>>>>>>>>>");
+        console.log(data);
+        this.setState({
+          challenges: data.challenges,
+          gameLoaded: true
+        }); 
+      }.bind(this)
+    });
 
   },
 
@@ -29,7 +42,7 @@ var PlayAdventure = React.createClass({
   //proceed to next stage
   proceedToNextLocation: function() {
     this.setState({nextStop: ""});
-    if (this.state.current < this.props.challenges.length-1){
+    if (this.state.current < this.state.challenges.length-1){
       //get questions from ajax and answers
       console.log("incrementing stage>>>>>>>>>>>>>>>>>>>>>>>");
       console.log("nextStop"+this.state.nextStop);
@@ -59,17 +72,22 @@ var PlayAdventure = React.createClass({
     ///////TODO move to states
     //at least I got this correct
     //here I'm getting all the data at once!
-    var challenge = this.props.challenges[this.state.current];
-    var loc     = challenge.address;
-    var lat     = challenge.latitude; 
-    var lng     = challenge.longitude; 
-    //Fetch later
-    var quiz      = challenge.questions;
+    //var challenge = this.props.challenges[this.state.current];
 
-    //riddle
-    var riddle   = challenge.riddle.content;
-    var hint     = challenge.riddle.hint;
-    var solution = challenge.riddle.solution; 
+    if(this.state.gameLoaded) {
+        var challenge = this.state.challenges[this.state.current];
+        var loc     = challenge.address;
+        var lat     = challenge.latitude; 
+        var lng     = challenge.longitude; 
+
+        //Fetch later
+        var quiz      = challenge.questions;
+
+        //riddle
+        var riddle   = challenge.riddle.content;
+        var hint     = challenge.riddle.hint;
+        var solution = challenge.riddle.solution; 
+    }
 
     //TODO improve logic once data is retrieved from server
     var quizForm = <Quiz onComplete={this.proceedToNextLocation} 
@@ -101,20 +119,21 @@ var PlayAdventure = React.createClass({
     //here a giant if-else statement with showQuestions
 
     if (this.state.finalChallenge && this.props.include_final) { //after finish challenges
-      return <div><Monster /></div>;
+      return <div><Monster adventure_id={this.props.adventure_id} /></div>;
     }
     else if (this.state.finalChallenge) {
       return <div> You are done </div>;
     }
-    else {  //renders along with answers
+    else if (this.state.gameLoaded) {  //renders along with answers
       //here slide question form infront of map or along with it
-      return <div><h1>{this.props.name}</h1>
-              <div className="question-map-box">
+      return <div className="question-map-box">
+                <div className="name-box">{this.props.name}</div>
                 <div className="lives-box">{lives}</div>
                 <div className="question-box">{quizForm}</div>
                 <div >{mapForm}</div>
-              </div>
-            </div>;
+              </div>;
+    } else {
+      return <h1>Loading Game...</h1>;
     }
     
   } 

@@ -59,9 +59,19 @@ var CreateOverview = React.createClass({
 
   render: function () {
 
-    var name = <div><input type="text" placeholder="Enter Name of Adventure" ref="nameInput" onChange={this.nameInput}/></div>;  
-    var description = <div><textarea name="description" placeholder="Enter a description" ref="descInput" onChange={this.descInput} /></div>;  
-    var locsBox = <div><textarea className="locsBox" name="locations" placeholder="Enter Locations separated by semicolon" ref="locInput" onChange={this.locInput}/></div>;  
+    var name = <div className="form-group">
+                <input type="text" placeholder="Enter Name of Adventure" ref="nameInput" onChange={this.nameInput} className="form-control"/>
+               </div>;  
+    var description = <div className="form-group">
+                        <textarea name="description" placeholder="Enter a description" ref="descInput" onChange={this.descInput} className="form-control" />
+                      </div>;  
+    var locsBox = <div className="form-group">
+                    <textarea className="locsBox" name="locations" 
+                              placeholder="Enter Locations separated by semicolon" 
+                              ref="locInput" onChange={this.locInput} className="form-control"/>
+                  </div>;  
+
+    
     //this is a test
     //var locsBox = <select multiple="true" name="locations" ref="locInput" onChange={this.locInput}>
     //                <option value="AC">Apple</option>
@@ -69,10 +79,17 @@ var CreateOverview = React.createClass({
     //                <option value="AM">Citrus</option>
     //                <option value="AP">Dragonfruit</option>
     //              </select>;
+
     //TODO style as next button
-    var nextButton = <div><input type="submit" value="Next" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
+    var btn_style = {float: "right"};
+    var nextButton = <div>
+                        <button style={btn_style} type="submit" className="btn btn-primary" 
+                                onClick={this.onSubmit} disabled={!this.isReady()}>
+                        <i class="glyphicon glyphicon-chevron-right"></i>Next
+                      </button>
+                    </div>;
     //giant if-else statement here to render different views depending on state
-    return <div>{name} {description} {locsBox} {nextButton}</div>
+    return <div className="form">{name} {description} {locsBox} {nextButton}</div>
   
   }
 

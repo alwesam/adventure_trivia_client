@@ -224,6 +224,8 @@ var Map = React.createClass({
  
   getInitialState: function () {
     return {map: null, 
+            mapWidth: window.innerWidth,
+            mapHeight: window.innerHeight,
             mapBounds: null, 
             panorama: null};
   },
@@ -255,12 +257,22 @@ var Map = React.createClass({
     //set panorama
     this.setState({panorama: map.getStreetView()});
 
+    //another dirty hack
+    google.maps.event.addDomListener(window, "resize", function() {
+
+       this.setState({mapWidth: window.innerWidth});
+       this.setState({mapHeight: window.innerHeight});
+       
+       var center = map.getCenter();
+       google.maps.event.trigger(map, "resize");
+       map.setCenter(center); 
+     }.bind(this));
+
     /**
      * The following code to keep map centered when reizing window was taken from
      * the following stackoverflow link:
      * http://stackoverflow.com/questions/23947904/keep-google-maps-centered-when-window-resize
      */
-    //TODO review this code
     google.maps.event.addListener(map, 'center_changed', function() {
 	    var size = [this.getDiv().offsetWidth,this.getDiv().offsetHeight].join('x');
 	    if( !this.get('size') || size === this.get('size')){
@@ -344,7 +356,7 @@ var Map = React.createClass({
 
     //I'm just puting markers there in order to have render on the map
     //TODO fix style to make it responsive
-    var style = {height: "500px", width: "1000px"};
+    var style = {height: this.state.mapHeight, width: this.state.mapWidth};
     //var button = <div id="panel" >
     //                <input type="button" value="Toggle Street View" onClick={this.toggleStreetView}/>
     //             </div>;
