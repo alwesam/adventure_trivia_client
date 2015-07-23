@@ -32,18 +32,20 @@ var Adventure = React.createClass({
       var stars = arr.map(function (i) {
               return <img src="img/ruby.png" height="30" width="30" /> });
     else
-      var stars = <h4>Not Rated</h4>
+      var stars = <h5>Not Rated Yet</h5>
 
     if (this.state.detailsFetched) {
       return <div className="row adventure-item-details">
-                <div className="col-md-6">
+                <div className="col-md-5">
                   <h3>{this.props.name}</h3>
                   <div>{stars}</div>
                 </div>
                 <div className="col-md-6">
                   <h4>{this.props.description}</h4>
-                  <button className="btn btn-primary" href="#" onClick={this.startAdventure}>Play</button>
-                  <button className="btn btn-primary" href="#" onClick={this.hideAdventure} >Hide</button>
+                  <button className="btn btn-danger" href="#" onClick={this.startAdventure}>Play</button>
+                </div>
+                <div className="col-md-1">
+                  <button className="btn btn-link" href="#" onClick={this.hideAdventure} >X</button>
                 </div>
               </div>;
     }
@@ -61,6 +63,7 @@ var Adventures = React.createClass({
     return {adventures: [], 
             passed_up_id: null, //not ideal, this 
             startAdventure: false,
+            createAdventure: false,
             title: "",
             showSpinner: true}
   },
@@ -86,6 +89,10 @@ var Adventures = React.createClass({
                     passed_up_id: id }); 
   },
 
+  create: function () {
+    this.setState({createAdventure: true});
+  },
+
   render: function () {
     
     var adventures = this.state.adventures.map(function(a) {
@@ -96,6 +103,8 @@ var Adventures = React.createClass({
                             start={this.start} />; 
     }.bind(this));
 
+    console.log("list of adventures "+this.state.adventures.length);
+
     var spinnerDisplay = this.state.showSpinner ? "block" : "none";
     var spinnerStyle   = {display: spinnerDisplay};
     
@@ -105,18 +114,31 @@ var Adventures = React.createClass({
                             name= {this.state.title} 
                              />;
     }
-    else { //render a list
-      return <div>
+    else if (this.state.createAdventure) {
+      return <CreateAdventure />;
+    }
+    else if (this.state.adventures.length > 0) { //render a list
+      return <div className="create-page">
                <div style={spinnerStyle} className="text-center">
                  <h2>Loading...</h2>
                </div>
                <div className="adventures-list">
-                <h2>Choose Your Adventure</h2>
                 {adventures}
                </div>
              </div>;
     }
+    else 
+      return <div className="create-page">
+               <div style={spinnerStyle} className="text-center">
+                 <h2>Loading...</h2>
+               </div>
+               <div className="text-center">
+                 <h2> No adventure created yet. Create your own <a href="#" onClick={this.create}>Adventure!</a></h2>
+               </div>
+             </div>;
+       
   }
+
 });
 
 //Here is the landing page
@@ -137,15 +159,14 @@ var HomePage = React.createClass({
 
     var homePage = <div className="text-center homepage-box">
                        <h1>Welcome to Adventure Trivia</h1>
-                    <div className="homepage-actions">
+                       <img src="img/background.jpg" />
                        <h3><a href="#" onClick={this.create}>Create an Adventure</a></h3>
                        <h3><a href="#" onClick={this.play}>Play an Adventure</a></h3>
-                    </div>
                    </div>;
 
     if (this.state.createAdventure)
       //define styling for all inputs, textareas and buttons
-      return <div className="container-fluid"> <CreateAdventure /></div>;
+      return <CreateAdventure />;
     else if (this.state.playAdventure)
       return <div> <Adventures /> </div>;
     else

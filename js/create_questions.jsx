@@ -30,9 +30,12 @@ var MakeAnswers = React.createClass({
   },
 
   render: function () {
-    var answer = <input type="text" placeholder="Enter Answer" ref="answerInput" onChange={this.answerInput}/>;  
-    var trueOrNot = <input type="radio" name={this.props.question} ref="userSelect" onChange={this.checkSelect} />;  
-    return <div>{answer}&nbsp;&nbsp;<span>{trueOrNot}</span></div>;
+    var style1 = {width: "90%", float: "left"  };
+    var style2 = {width: "10%", float: "left", height: "25px" };
+    var answer = <input type="text" style={style1} className="form-control" placeholder="Enter Answer" ref="answerInput" onChange={this.answerInput}/>;  
+    var trueOrNot = <input type="radio" style={style2} className="form-control" name={this.props.question} ref="userSelect" onChange={this.checkSelect} />;  
+    //return <div>{answer}&nbsp;&nbsp;<span>{trueOrNot}</span>
+    return <div className="form-group">{answer}{trueOrNot}</div>;
   }
 
 });
@@ -62,10 +65,6 @@ var CreateQuestion = React.createClass({
 
     var choices = this.state.choices;
 
-    //var bool = (this.state.answer == choice) ? true : false;
-    ///TODO fix
-    //choices[index] = {content: choice, correct: checked};
-    
     choices[index] = {content: choice};
     
     this.setState({choices: choices});
@@ -91,9 +90,12 @@ var CreateQuestion = React.createClass({
 
   render: function () {
 
-    var question = <div><input type="text" 
+    var style = {width: "90%"};
+    var question = <div className="form-group"><input type="text" 
                            placeholder="Enter Question" 
                            ref="questionInput" 
+                           style={style}
+                           className="form-control"
                            onChange={this.questionInput}/></div>;
 
     //3 possible answers.... for now
@@ -107,7 +109,7 @@ var CreateQuestion = React.createClass({
     }.bind(this));
 
     //return <div> {question} {answers} {submitQuestion}</div>; 
-    return <div> {question} {answers} </div>; 
+    return <div className="form question-form"> {question} {answers} </div>; 
   }
 
 });
@@ -126,28 +128,11 @@ var CreateQuestionsContainer = React.createClass({
   addToContainer: function (index, question_obj) {
     var arr = this.state.questions;
     arr[index] = question_obj; 
-    console.log("question object content is :"+question_obj.content);
-    console.log("question object answer is :"+question_obj.answer);
-    console.log("question object answer0 content is :"+question_obj.answers[0].content);
-    //console.log("question object answer0 boolean is :"+question_obj.answers[0].correct);
-    console.log("question object answer1 content is :"+question_obj.answers[1].content);
-    //console.log("question object answer1 boolean is :"+question_obj.answers[1].correct);
-    console.log("question object answer2 content is :"+question_obj.answers[2].content);
-    //console.log("question object answer2 boolean is :"+question_obj.answers[2].correct);
     this.setState({questions: arr});
   },
 
   onSubmit: function () {
     //pass an array of objects
-    console.log("passing an arry of objects"+this.state.questions);
-    console.log("question object content is :"+this.state.questions[0].content);
-    console.log("question object answer is :"+this.state.questions[0].answer);
-    console.log("question object answer0 content is :"+this.state.questions[0].answers[0].content);
-    //console.log("question object answer0 boolean is :"+this.state.questions[0].answers[0].correct);
-    console.log("question object answer1 content is :"+this.state.questions[0].answers[1].content);
-    //console.log("question object answer1 boolean is :"+this.state.questions[0].answers[1].correct);
-    console.log("question object answer2 content is :"+this.state.questions[0].answers[2].content);
-    //console.log("question object answer2 boolean is :"+this.state.questions[0].answers[2].correct);
     this.props.addToChallenge(this.state.questions);
   },
 
@@ -173,9 +158,14 @@ var CreateQuestionsContainer = React.createClass({
     for(var i=0; i<this.state.numQuestions; i++)
       arr.push('');
 
-    var submitQuestions= <div><input type="submit" value="Create Question(s)" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
-
-    console.log("array of questions length "+arr.length);
+      style = {width: "90%"};
+      var submitQuestions= <div className="form-group">
+                            <input type="submit" 
+                                   className="form-control" 
+                                   style={style}
+                                   value="Create Question(s)" 
+                                   onClick={this.onSubmit} disabled={!this.isReady()} />
+                           </div>;
 
     var questions = arr.map(function (question, index){
       return (
@@ -187,7 +177,8 @@ var CreateQuestionsContainer = React.createClass({
 
     return <div><h3>Questions about {this.props.loc}</h3>
                 {questions}
-                <div><a href="#" onClick={this.addQuestion}> Add Question </a></div>
+                <div className="clearfix"></div><br/>
+                <div className="text-center"><a href="#" onClick={this.addQuestion}> Add Question </a></div>
                  {submitQuestions}
            </div>; 
   

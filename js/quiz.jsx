@@ -99,8 +99,6 @@ var Quiz = React.createClass({
   questionSolved: function () {
     //here call playadventure which calls map and marker to move into the next
     //question 
-    console.log("question solved>>>>>>>>>>>>>>>");
-    console.log("next quesiton??????????????  "+this.props.quiz[this.state.questionIndex].content);
     //TODO do some work here for pattern matching
     //this.props.questionDone(this.makeid());
     this.props.questionDone(this.props.quiz[this.state.questionIndex].content);
@@ -114,15 +112,8 @@ var Quiz = React.createClass({
   },
 
   checkAnswers: function () {
-
     //TODO do an AJAX request here with server to check answers
-    console.log("given solution "+this.state.solution);
-    console.log("correct solution "+this.props.quiz[this.state.questionIndex].answer);
-    if(this.state.solution === this.props.quiz[this.state.questionIndex].answer)
-      return true;
-    else
-      return false;
-
+    return (this.state.solution === this.props.quiz[this.state.questionIndex].answer);
   },
 
   handleSubmit: function (e, submittedData) {
@@ -176,9 +167,8 @@ var Quiz = React.createClass({
 
     var gameover = <div> GAME OVER </div>
 
-    //var riddle = this.props.loc ? <h3> Solve riddle to move on to final challenge</h3> :
-    //                              <h3> Solve riddle to move on to next destination</h3>;
-    var riddle = <h4> Solve riddle to move on to next destination</h4>;
+    var riddle = (this.props.finalStage) ? <h4> You are getting close. Solve this riddle and you will be faced with the final challenge </h4> : 
+                                            <h4> Solve riddle to move on to your next adventure location</h4>;
 
     if(this.state.gameOver)
       return gameover;

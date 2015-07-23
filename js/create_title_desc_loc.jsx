@@ -71,25 +71,12 @@ var CreateOverview = React.createClass({
                               ref="locInput" onChange={this.locInput} className="form-control"/>
                   </div>;  
 
-    
-    //this is a test
-    //var locsBox = <select multiple="true" name="locations" ref="locInput" onChange={this.locInput}>
-    //                <option value="AC">Apple</option>
-    //                <option value="AD">Banana</option>
-    //                <option value="AM">Citrus</option>
-    //                <option value="AP">Dragonfruit</option>
-    //              </select>;
-
     //TODO style as next button
-    var btn_style = {float: "right"};
-    var nextButton = <div>
-                        <button style={btn_style} type="submit" className="btn btn-primary" 
-                                onClick={this.onSubmit} disabled={!this.isReady()}>
-                        <i class="glyphicon glyphicon-chevron-right"></i>Next
-                      </button>
-                    </div>;
+    var nextButton = <div className="form-group">
+                         <input type="submit" className="form-control" value="Next" onClick={this.onSubmit} disabled={!this.isReady()} />
+                       </div>;
     //giant if-else statement here to render different views depending on state
-    return <div className="form">{name} {description} {locsBox} {nextButton}</div>
+    return <div className="form">{name} {description} {locsBox} {nextButton}</div>;
   
   }
 

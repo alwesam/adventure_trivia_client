@@ -32,18 +32,28 @@ var CreateRiddle = React.createClass({
 
   render: function () {
     
-    var content = <div><textarea name="riddle" placeholder="Enter Riddle" ref="riddleInput" onChange={this.riddleInput}/></div>;  
-    var solution = <div><input type="text" placeholder="Enter Solution" ref="solutionInput" onChange={this.solutionInput}/></div>;  
-    var hint = <div><textarea name="Hint" placeholder="Enter Hint" ref="hintInput" onChange={this.hintInput} /></div>;  
+    var content = <div className="form-group">
+                    <textarea className="form-control" name="riddle" placeholder="Enter Riddle" ref="riddleInput" onChange={this.riddleInput}/>
+                  </div>;  
 
-    var submitButton = <div><input type="submit" value="Submit Riddle" onClick={this.onSubmit} disabled={!this.isReady()} /></div>;
+    var solution = <div className="form-group">
+                     <input type="text" className="form-control" placeholder="Enter Solution" ref="solutionInput" onChange={this.solutionInput}/>  
+                   </div>
+
+    var hint = <div className="form-group">
+                <textarea className="form-control" name="Hint" placeholder="Enter Hint" ref="hintInput" onChange={this.hintInput} />
+               </div>;  
+
+    var submitButton = <div className="form-group">
+                         <input type="submit" className="form-control" value="Create Riddle" onClick={this.onSubmit} disabled={!this.isReady()} />
+                       </div>;
 
     if(this.props.nextLoc != null)
-      var nextLoc = <div>Enter a riddle pour prochaine loc {this.props.nextLoc}</div>;
+      var nextLoc = <div>Enter a riddle whose answer is {this.props.nextLoc}</div>;
     else
-      var nextLoc = <div>Enter a Riddle of your Choice</div>;
+      var nextLoc = <div>Enter a one-word answer riddle of your choice</div>;
    
-    return <div> {nextLoc} {content} {solution} {hint} {submitButton} </div>; 
+    return <div className="form"> {nextLoc} {content} {solution} {hint} {submitButton} </div>; 
   
   }
 

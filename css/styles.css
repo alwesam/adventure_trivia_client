@@ -1,4 +1,3 @@
-/*html, body, .row, .col-md-9, #map_canvas {height: 100%;}*/
 html, body {height: 100%;}
 
 .homepage-actions {
@@ -6,14 +5,50 @@ html, body {height: 100%;}
 }
 
 .homepage-box {
+  margin-top: 2%;
+}
+
+.homepage-box h1 {
+  color: rgb(120, 0, 0);
+}
+
+.homepage-box img {
+  max-width: 600px;
+  min-width: 300px;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.create-page {
+  background-color: #FFBF00;
+  height: 100vh;
+  padding-top: 5%;
+}
+
+.question-form {
+  padding-top: 2%;
+}
+
+.finalpage-box {
   margin-top: 5%;
 }
 
-.adventures-container {
-  /*background-color: #E6BC69;*/
+.accept-box { 
+  margin-top: 5%;
+  /*width: 50px;*/
+  color: rgb(120, 0, 0);
+};
+
+.accept-box button {
+  background-color: rgb(190, 141, 52);
 }
 
 .adventure-item-details {
+  max-width: 1000px;
+  min-width: 300px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-radius: 10px;
   background-color: #E6BC69;
 }
 
@@ -30,37 +65,77 @@ html, body {height: 100%;}
   text-decoration: none;
 }
 
-.name-box {
+.final-page {
+  padding-top: 20px;
+  background-color: black;
+  height: 100vh;
   color: green;
-  position: absolute;
-  z-index: 400;
-  top: 0px;
-  background-color: rgba(255,255,255,.8);
-  padding: 20px;
-  border-radius: 20px;
-  left: 300px;
 }
+
+.final-page img {
+  max-width: 350px;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.closing-page {
+  padding-top: 20px;
+  height: 100vh;
+}
+
+.game-lost {
+  background-color: black;
+}
+
+.closing-page img {
+  max-width: 250px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 
 .lives-box {
   position: absolute;
   z-index: 400;
-  top: 300px;
+  bottom: 50px;
   background-color: rgba(255,255,255,.8);
   padding: 20px;
   border-radius: 20px;
-  left: 500px;
+  right: 50px;
+}
+
+.name-box {
+  color: #D2691E;
+  text-align: center;
+  position: absolute;
+  z-index: 400;
+  top: 50px;
+  background-color: rgba(255,255,255,.8);
+  padding: 20px;
+  border-radius: 20px;
+  right: 50px;
 }
 
 .question-box {
   position: absolute;
   z-index: 200;
-  top: 150px;
+  top: 25%;
   background-color: rgba(255,255,255,.8);
   padding: 20px;
   border-radius: 20px;
-  left: 300px;
+  width: 20%;
+  left: 40%;
 }
 
 .question-map-box {
   position: relative;
+}
+
+.final-page h1 {margin-top: 0}
+
+@media (max-width: 800px) {
+  .question-box {
+    width: 50%;
+    left: 25%;
+  }
 }

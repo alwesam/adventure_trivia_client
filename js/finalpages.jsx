@@ -17,34 +17,34 @@ var Monster = React.createClass({
   },
 
   render: function(){
-    var monster = <div className="text-center">
-                    <h1>You must choose, but choose wisely</h1>
-                    <h2><a href="#" onClick={this.choose}>OK, Got it..</a></h2>;
+    var monster = <div className="text-center final-page">
+                    <h2>You have braved many risks to get here and for this I salute you</h2>
+                    <img src="img/knight.png"/>
+                    <h2>However, before you get your hands on the treasure, you must pass the final challenge </h2>
+                    <h2>You must choose, but choose wisely</h2>
+                    <div className="accept-box">
+                      <button onClick={this.choose}>Accept Challenge</button>
+                    </div>
                   </div>;
 
-    var vim   = <img width="200" height="200" border="5" src="img/vim.png" onClick={this.gameWon}/>;
-    var emacs = <img width="200" height="200" border="5" src="img/emacs.png" onClick={this.gameLost}/>;
+    var android   = <img width="200" border="5" src="img/android.png" onClick={this.gameWon}/>;
+    var iphone    = <img width="200" border="5" src="img/iphone.png"  onClick={this.gameLost}/>;
     
-    //var vim =   <div style={style}></div>;
-    //var emacs = <div style={style}></div>;
+    var finalPage = <FinalPage adventure_id={this.props.adventure_id} name={this.props.name} won={this.state.won} />;
 
-    var finalPage = <FinalPage adventure_id={this.props.adventure_id} />;
-    var finalPageLost = <FinalPageLost />;
-
-    if (this.state.won)
+    if (this.state.won || this.state.loss)
       return <div>{finalPage}</div>;
-    else if (this.state.loss)
-      return <div>{finalPageLost}</div>;
     else if (this.state.choose)
-      return <div className="container">
-                <div className="row">
+      return <div className="text-center final-page">
+              <h1> Choose Wisely </h1>
+              <div className="finalpage-box">
                   <div className="col-md-6">
-                    {vim}
+                    {android}
                   </div>
                   <div className="col-md-6">
-                   {emacs}
+                   {iphone}
                   </div>
-                </div>
+               </div>
               </div>;
     else
       return monster;
@@ -55,7 +55,7 @@ var Monster = React.createClass({
 var FinalPage = React.createClass({
 
   getInitialState: function () {
-    return {rating: 0, ratingText: "Choose a rating"};
+    return {home: false, playAgain: false, rating: 0, ratingText: "Choose a rating"};
   },
 
   componentDidUpdate: function () {
@@ -86,9 +86,21 @@ var FinalPage = React.createClass({
     //make a post request to post review 
   }, 
 
+  goHome: function () {
+    this.setState({home: true});
+  },
+
+  playAgain: function () {
+    this.setState({playAgain: true});
+  },
+
   render: function(){
 
-    var image = <div><img src={'img/wisely.jpg'} /></div>;
+    var image_wisely = <div><img src={'img/wisely.jpg'} /></div>;
+    var treasure = <div><img src={'img/treasure.png'} /></div>;
+
+    var image_poorly = <div><img src={'img/poorly.jpg'} /></div>;
+    var bones = <div><img src={'img/skeleton.jpg'} /></div>;
 
     //TODO fix!!!!!!!!!!!!!1
     var stars = <span className="star-rating">
@@ -101,26 +113,29 @@ var FinalPage = React.createClass({
 
     //TODO 
     //var inviteFriends = <h4><a href="#">Invite your friends</a></h4>;
+    var home = <h3><a href="#" onClick={this.goHome}> Home </a></h3>;
+    var playAgain = <h3><a href="#" onClick={this.playAgain}> Play Again </a></h3>;
 
-    return <div className="text-center">
-            <h1>Congratulations!</h1>
-            {image}
+    if (this.state.home)
+      return <HomePage />
+    else if (this.state.playAgain) {
+      return <PlayAdventure include_final={true} adventure_id={this.props.adventure_id} name={this.props.name} />
+    }
+    else if (this.props.won)
+      return <div className="text-center closing-page">
+            {image_wisely}
+            {treasure}
             <div>{stars}</div>
             <div><strong>{this.state.ratingText}</strong></div>
-            <div></div>
+            <div>{playAgain}</div>
+            <div>{home}</div>
+           </div>; 
+    else
+      return <div className="text-center closing-page game-lost">
+             {image_poorly}
+             {bones}
+             <div>{playAgain}</div>
+             <div>{home}</div>
            </div>; 
   }
-});
-
-var FinalPageLost = React.createClass({
-
-  render: function(){
-    var image = <div><img src={'img/poorly.jpg'} /></div>;
-
-    return (
-      <div>
-      {image}
-      </div>); 
-  }
-
 });

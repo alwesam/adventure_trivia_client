@@ -9,7 +9,14 @@ var PlayAdventure = React.createClass({
              nextStop: "",
              hearts: 3,
              resetMap: false, 
+             finalStage: false,
              finalChallenge: false }
+  },
+
+  componentDidUpdate: function(prevState) {
+    //if(prevState.gameLoaded != this.state.gameloaded)
+    //  if (this.state.challenges.length-1 == 0) 
+    //      this.setState({finalStage: true});
   },
 
   componentDidMount: function () {
@@ -41,18 +48,16 @@ var PlayAdventure = React.createClass({
 
   //proceed to next stage
   proceedToNextLocation: function() {
-    this.setState({nextStop: ""});
+    this.setState({nextStop: "", resetMap: true, showQuestions: false});
     if (this.state.current < this.state.challenges.length-1){
-      //get questions from ajax and answers
-      console.log("incrementing stage>>>>>>>>>>>>>>>>>>>>>>>");
-      console.log("nextStop"+this.state.nextStop);
-      this.setState({current: this.state.current + 1});
-      //reset map and hide questions
-      this.setState({showQuestions: false, resetMap: true});
+      var stage = this.state.current+1;
+      if (stage == this.state.challenges.length-1)
+          this.setState({finalStage: true});
+      this.setState({current: stage});
     }
     else {
       //final challenge map
-      this.setState({finalChallenge: true, resetMap: true, showQuestions: false});
+      this.setState({finalChallenge: true});
     }
   },
 
@@ -79,32 +84,32 @@ var PlayAdventure = React.createClass({
         var loc     = challenge.address;
         var lat     = challenge.latitude; 
         var lng     = challenge.longitude; 
-
-        //Fetch later
+        //questions
         var quiz      = challenge.questions;
-
         //riddle
         var riddle   = challenge.riddle.content;
         var hint     = challenge.riddle.hint;
         var solution = challenge.riddle.solution; 
-    }
+        var finalStage = (this.state.challenges.length-1 === 0) ? true : this.state.finalStage;
 
     //TODO improve logic once data is retrieved from server
-    var quizForm = <Quiz onComplete={this.proceedToNextLocation} 
-                         questionDone={this.proceedToNextQuestion} 
-                         showQuestions={this.state.showQuestions}
-                         hearts={this.state.hearts}
-                         minusheart={this.minusheart}
-                         loc={loc} 
-                         quiz ={quiz} 
-                         clue={riddle} 
-                         clueHint={hint} 
-                         clueAns={solution}/>;
+      var quizForm = <Quiz onComplete={this.proceedToNextLocation} 
+                           questionDone={this.proceedToNextQuestion} 
+                           showQuestions={this.state.showQuestions}
+                           hearts={this.state.hearts}
+                           minusheart={this.minusheart}
+                           finalStage={finalStage}
+                           loc={loc} 
+                           quiz ={quiz} 
+                           clue={riddle} 
+                           clueHint={hint} 
+                           clueAns={solution}/>;
 
-    var mapForm = <Map loc={loc} lat={lat} lng={lng} 
-                       nextStop={this.state.nextStop}
-                       renderQuestions={this.renderQuestions} 
-                       resetMap={this.state.resetMap} />;
+      var mapForm = <Map loc={loc} lat={lat} lng={lng} 
+                         nextStop={this.state.nextStop}
+                         renderQuestions={this.renderQuestions} 
+                         resetMap={this.state.resetMap} />;
+    }
 
     var monsterForm = <Monster />;
 
@@ -114,12 +119,12 @@ var PlayAdventure = React.createClass({
 
     //TODO heart instead of ruby
     var lives = arr.map(function (i) {
-            return <img src="img/ruby.png" height="35" width="35" /> });
+            return <img src="img/heart.png" height="35" width="35" /> });
 
     //here a giant if-else statement with showQuestions
 
     if (this.state.finalChallenge && this.props.include_final) { //after finish challenges
-      return <div><Monster adventure_id={this.props.adventure_id} /></div>;
+      return <Monster adventure_id={this.props.adventure_id} name={this.props.name} />;
     }
     else if (this.state.finalChallenge) {
       return <div> You are done </div>;

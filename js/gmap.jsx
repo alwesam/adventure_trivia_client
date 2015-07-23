@@ -34,6 +34,30 @@ var Marker = React.createClass({
   //once state with current location, place it on the map
   componentDidUpdate: function (prevProps, prevState) {
     if(prevState.currentLoc != this.state.currentLoc) {
+
+      if(this.state.currentMarker != null) {
+         //set previous marker to flag
+         var _FLAG = new google.maps.MarkerImage(
+              "img/flag.png",
+              null, /* size is determined at runtime */
+              null, /* origin is 0,0 */
+              null, /* anchor is bottom center of the scaled image */
+              new google.maps.Size(60, 60)
+          );
+         var m = this.state.currentMarker;
+         m.setVisible(true);
+         m.setClickable(false);
+         m.setIcon(_FLAG);
+
+        //remove all the gem markers from map
+        for(var i = 0; i < this.state.gems.length; i++)
+            this.state.gems[i].setMap(null);
+
+        //empty array
+        this.setState({gems: []});
+  
+      }
+
       this.setState({currentMarker: this.addMarker(null)});
       //establish a new bound
       console.log("establishing a new bound at >>>>>>>>>>>>>>>>"+this.props.loc);
@@ -78,6 +102,9 @@ var Marker = React.createClass({
      //TODO do in the map check!!!!!!!!
      this.props.extendMap(bounds, lat, lng);
 
+     google.maps.event.addListener(marker, 'mouseover', function(){
+       marker.setAnimation(google.maps.Animation.BOUNCE);
+     });
 
      //add event listner
      google.maps.event.addListener(marker,'click',function() {          
@@ -123,6 +150,7 @@ var Marker = React.createClass({
     var safety = 0;
     
     var that = this;
+
     var getPanorama = function (streetViewPanoramaData, status) {
 
         //TODO fix and finish
@@ -136,40 +164,62 @@ var Marker = React.createClass({
             map: that.props.map
           });
         };
-      
-        if (status === google.maps.StreetViewStatus.OK) {
-
-          //TODO fix
-          var oldPoint = point;
-          point = streetViewPanoramaData.location.latLng;
-
-          //TODO this is a hack for now
-          var newLat = point.lat()+0.0002;
-          var newLng = point.lng();
-
-          var _GREEN = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-          var _INDIANA = 'img/indiana.jpg';
-
-          //var _RUBY = 'img/ruby.jpg';
+        
+        var addGem = function(newLat, newLng, title) {
+  
           //http://stackoverflow.com/questions/7842730/change-marker-size-in-google-maps-v3
           var _RUBY = new google.maps.MarkerImage(
               "img/ruby.png",
               null, /* size is determined at runtime */
               null, /* origin is 0,0 */
               null, /* anchor is bottom center of the scaled image */
-              new google.maps.Size(30, 30)
+              new google.maps.Size(40, 40)
           );
 
-          var target = new google.maps.Marker({
+          var _INDY = new google.maps.MarkerImage(
+              "img/indiana.jpg",
+              null, /* size is determined at runtime */
+              null, /* origin is 0,0 */
+              null, /* anchor is bottom center of the scaled image */
+              new google.maps.Size(80, 120)
+          );
+
+          var gem = new google.maps.Marker({
               position: new google.maps.LatLng(newLat, newLng),
-              //position: point,
-              map: this.props.map,
-              title: streetViewPanoramaData.location.description,
+              map: that.props.map,
+              title: title,
               icon: _RUBY
           });
-          
-          //drawLine(marker.getPosition(), target.getPosition());
+        
+          //TODO watch this
+          that.setState({gems: that.state.gems.concat(gem)});
 
+          google.maps.event.addListener(gem, 'click', function() {
+              //here call the question
+              that.props.renderQuestions();
+              //set icon to something else and set to unclickable
+              gem.setClickable(false);
+              gem.setIcon(_INDY); //TODO
+          });
+
+        };
+      
+        if (status === google.maps.StreetViewStatus.OK) {
+
+          var random = function () {
+            return Math.floor(Math.random() * 0.0004)-0.0002; 
+          };
+
+          var oldPoint = point;
+          point = streetViewPanoramaData.location.latLng;
+
+          //TODO this is a hack for now
+          var newLat = point.lat()+random();
+          var newLng = point.lng()+random();
+
+          addGem(newLat, newLng, streetViewPanoramaData.location.description);
+
+          //drawLine(marker.getPosition(), gem.getPosition());
           //from google maps api docs: Returns the heading from one LatLng to another LatLng.
           //Headings are expressed in degrees clockwise from North within the range [-180,180).
           //TODO bug with heading computation
@@ -183,13 +233,6 @@ var Marker = React.createClass({
           });
           panorama.setVisible(true);
 
-          google.maps.event.addListener(target, 'click', function() {
-              //here call the question
-              that.props.renderQuestions();
-              //set icon to flag and set to unclickable
-              target.setClickable(false);
-              //panorama.setVisible(false);
-          });
 
         } else { 
 
@@ -197,18 +240,19 @@ var Marker = React.createClass({
             safety += 1;
             console.log("trying: "+safety);
             streetViewMaxDistance = streetViewMaxDistance*2;
-
+            //try again
             streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
           } else {
-            //TODO doesn't work, investigate
             //this.setState({markerStatus: "Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters"});
             console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters");
+            addGem(point.lat(), point.lng(), "");
           }
           
         }
 
     }.bind(this);
 
+    //start looking for a view
     streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
     
   },
@@ -248,7 +292,7 @@ var Map = React.createClass({
   createMap: function () {
     
     var mapOptions = {
-          zoom: 12
+      //zoom: 12
     };
 
     //create map object 
@@ -298,10 +342,12 @@ var Map = React.createClass({
       console.log("extending locally");
       console.log(inbounds);
       bounds = inbounds 
+      //zoom_level = 15;
     }
     else{
       console.log("extending globally");
       bounds = this.state.mapBounds;
+      //zoom_level = 8;
     }
 
 	  bounds.extend(new google.maps.LatLng(lat, lng));
