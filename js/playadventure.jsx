@@ -6,6 +6,7 @@ var PlayAdventure = React.createClass({
              challengeID: 0,
              showQuestions: false, 
              gameLoaded: false,
+             restart: false,
              nextStop: "",
              hearts: 3,
              resetMap: false, 
@@ -73,6 +74,10 @@ var PlayAdventure = React.createClass({
     this.setState({hearts: this.state.hearts-1});
   },
 
+  gameOver: function () {
+    this.setState({restart: true});
+  },
+
   render: function () {
     ///////TODO move to states
     //at least I got this correct
@@ -96,9 +101,11 @@ var PlayAdventure = React.createClass({
       var quizForm = <Quiz onComplete={this.proceedToNextLocation} 
                            questionDone={this.proceedToNextQuestion} 
                            showQuestions={this.state.showQuestions}
+                           toggleInstruct={this.state.resetMap}
                            hearts={this.state.hearts}
                            minusheart={this.minusheart}
                            finalStage={finalStage}
+                           gameOver={this.gameOver}
                            loc={loc} 
                            quiz ={quiz} 
                            clue={riddle} 
@@ -128,6 +135,9 @@ var PlayAdventure = React.createClass({
     }
     else if (this.state.finalChallenge) {
       return <div> You are done </div>;
+    }
+    else if (this.state.restart) {
+      return <PlayAdventure include_final={true} adventure_id={this.props.adventure_id} name={this.props.name} />
     }
     else if (this.state.gameLoaded) {  //renders along with answers
       //here slide question form infront of map or along with it

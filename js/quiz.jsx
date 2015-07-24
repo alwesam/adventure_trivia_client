@@ -139,6 +139,10 @@ var Quiz = React.createClass({
         this.setState({warning: "Incorrect, try again. Hint: "+this.props.clueHint}); 
     }
   },
+  
+  reStart: function () {
+    this.props.gameOver();
+  },
 
   render: function() {
 
@@ -163,9 +167,10 @@ var Quiz = React.createClass({
              </div>
           </div>;
 
-    var paragraph = <div> Find a ruby, click on it and solve the question </div>;
+    var find_ruby = <div className="text-center"> Let's find some rubies. </div>;
+    var next_ruby = <div className="text-center"> Awesome, find the next ruby. Embrace the adventure. </div>;
 
-    var gameover = <div> GAME OVER </div>
+    var gameover = <div> GAME OVER <h4><a href="#" onClick={this.reStart}>Restart</a></h4></div>
 
     var riddle = (this.props.finalStage) ? <h4> You are getting close. Solve this riddle and you will be faced with the final challenge </h4> : 
                                             <h4> Solve riddle to move on to your next adventure location</h4>;
@@ -176,8 +181,8 @@ var Quiz = React.createClass({
       return <div>
              <div>{riddle}</div> 
              <div><strong>{this.props.clue}</strong></div>
-             <div><input type="text" ref="userInput" /></div>
-             <input type="submit" value="Take me to the next adventure" onClick={this.solveClue}/>
+             <div className="form-group"><input className="form-control" type="text" ref="userInput" /></div>
+             <div className="form-group"><input className="form-control" type="submit" value="Take me to the next adventure" onClick={this.solveClue}/></div>
              <div style={warning_style}>
               {this.state.warning}
              </div>
@@ -186,8 +191,11 @@ var Quiz = React.createClass({
     else if (this.props.showQuestions) {
       return quizform; 
     }
+    else if (this.props.toggleInstruct) {
+      return next_ruby;
+    }
     else {
-      return paragraph;
+      return find_ruby;
     }
 
   }

@@ -27,7 +27,6 @@ var Adventure = React.createClass({
     for (var i = 0; i< parseInt(this.props.rating); i++)
       arr.push('');
 
-    //TODO star instead of ruby
     if(this.props.rating > 0)
       var stars = arr.map(function (i) {
               return <img src="img/ruby.png" height="30" width="30" /> });
@@ -36,11 +35,11 @@ var Adventure = React.createClass({
 
     if (this.state.detailsFetched) {
       return <div className="row adventure-item-details">
-                <div className="col-md-5">
+                <div className="col-md-6">
                   <h3>{this.props.name}</h3>
                   <div>{stars}</div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-5">
                   <h4>{this.props.description}</h4>
                   <button className="btn btn-danger" href="#" onClick={this.startAdventure}>Play</button>
                 </div>
@@ -50,6 +49,7 @@ var Adventure = React.createClass({
               </div>;
     }
     else {
+      var style = {float: "left"};
       return <div className="adventure-item">
                <h3><a href="#!" onClick={this.fetchDetails}> {this.props.name}</a></h3>
              </div>;

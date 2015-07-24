@@ -55,25 +55,35 @@ var Monster = React.createClass({
 var FinalPage = React.createClass({
 
   getInitialState: function () {
-    return {home: false, playAgain: false, rating: 0, ratingText: "Choose a rating"};
+      return {home: false, playAgain: false, audio: new Audio('music/indiana.wav'),
+              rating: 0, ratingText: "Choose a rating"};
   },
 
-  componentDidUpdate: function () {
+  componentWillReceiveProps: function () {
+  //TODO fix later
+  //if (this.props.won)
+  //    this.state.audio.play();
+  },
+
+  componentDidUpdate: function (prevState) {
     //do an ajax post request to send reviews
-    //to db
+ 
+    if (prevState.rating != this.state.rating) { 
 
-    var jsonData = {review: {rating: this.state.rating}};
+      var jsonData = {review: {rating: this.state.rating}};
 
-    var url = "http://localhost:3000/adventures/"+this.props.adventure_id+"/reviews";
-    
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: jsonData,
-      success: function (data) {
-        console.log("AJAX request POST result: "+data);
-      }.bind(this)
-    });
+      var url = "http://localhost:3000/adventures/"+this.props.adventure_id+"/reviews";
+      
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: jsonData,
+        success: function (data) {
+          console.log("AJAX request POST result: "+data);
+        }.bind(this)
+      });
+
+    }
 
   },
 

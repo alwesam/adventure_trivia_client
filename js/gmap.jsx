@@ -118,16 +118,23 @@ var Marker = React.createClass({
 
   decodeTarget: function () { 
     
-    var landmark = this.state.nextStop; 
+    var landmark = this.state.nextStop;// not being used for now 
     console.log("landmark passed is: "+landmark);
     var service = new google.maps.places.PlacesService(this.props.map);        
     var request = {location: this.state.currentMarker.getPosition(), 
-                   radius: 5000, //5 km 
-                   types: ["night_club"]}; //TODO test for now
+                   radius: 5000 //5 km 
+                   }; 
 
     service.nearbySearch(request, function (results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-          this.setState({gem: this.addMarker(results[0])});
+          console.log("this is how much results I'm getting "+results.length);
+          var rand = Math.floor(Math.random()*results.length-1);
+          if(this.state.selectRand === rand && rand < results.length-1)
+              rand++;
+          else if (this.state.selectRand === rand && rand > 0)
+              rand--;
+          this.setState({gem: this.addMarker(results[rand])});
+          this.setState({selectRand: rand});
         }
     }.bind(this)); 
   },
@@ -181,7 +188,15 @@ var Marker = React.createClass({
               null, /* size is determined at runtime */
               null, /* origin is 0,0 */
               null, /* anchor is bottom center of the scaled image */
-              new google.maps.Size(80, 120)
+              new google.maps.Size(50, 80)
+          );
+
+          var _STONE = new google.maps.MarkerImage(
+              "img/stone.png",
+              null, /* size is determined at runtime */
+              null, /* origin is 0,0 */
+              null, /* anchor is bottom center of the scaled image */
+              new google.maps.Size(80, 80)
           );
 
           var gem = new google.maps.Marker({
@@ -199,7 +214,7 @@ var Marker = React.createClass({
               that.props.renderQuestions();
               //set icon to something else and set to unclickable
               gem.setClickable(false);
-              gem.setIcon(_INDY); //TODO
+              gem.setIcon(_STONE); //TODO
           });
 
         };

@@ -158,7 +158,7 @@ var CreateQuestionsContainer = React.createClass({
     for(var i=0; i<this.state.numQuestions; i++)
       arr.push('');
 
-      style = {width: "90%"};
+      var style = {width: "90%"};
       var submitQuestions= <div className="form-group">
                             <input type="submit" 
                                    className="form-control" 
