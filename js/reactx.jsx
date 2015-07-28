@@ -72,7 +72,7 @@ var Adventures = React.createClass({
     
     //for now just do the following
     //var data = [{"name": "Find the Holy Grail", "description": "Indy!!!"}];
-    var url = "http://localhost:3000/adventures";
+    var url = "http://stark-ridge-5017.herokuapp.com/adventures";
     $.ajax({
       type: "GET",
       url: url,

@@ -25,7 +25,7 @@ var PlayAdventure = React.createClass({
     //off the challenge ID
     //questions and riddles
     $.ajax({
-      url: "http://localhost:3000/adventures/"+this.props.adventure_id+".json",
+      url: "http://stark-ridge-5017.herokuapp.com/adventures/"+this.props.adventure_id+".json",
       method: "GET",
       success: function(data){
         console.log("here are the details of adventure >>>>>>>>>>>>>>>>>");

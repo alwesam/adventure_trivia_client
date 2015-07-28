@@ -38,7 +38,7 @@ var CreateAdventure = React.createClass({
                 include_final: this.state.includeFinal}};
 
     console.log(jsonData);
-    var url ="http://localhost:3000/adventures"; 
+    var url ="http://stark-ridge-5017.herokuapp.com/adventures"; 
     
     $.ajax({
       type: "POST",
