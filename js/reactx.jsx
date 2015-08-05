@@ -14,7 +14,7 @@ var Adventure = React.createClass({
 
   //TODO review code
   startAdventure: function () {
-    this.props.start(this.props.name, this.props.id);
+    this.props.start(this.props.name, this.props.id, this.props.token);
   },
 
   hideAdventure: function () {
@@ -61,7 +61,8 @@ var Adventure = React.createClass({
 var Adventures = React.createClass({
   getInitialState: function () {
     return {adventures: [], 
-            passed_up_id: null, //not ideal, this 
+            passed_up_id: null, //not ideal 
+            passed_up_token: null, //not ideal 
             startAdventure: false,
             createAdventure: false,
             title: "",
@@ -72,6 +73,7 @@ var Adventures = React.createClass({
     
     //for now just do the following
     //var data = [{"name": "Find the Holy Grail", "description": "Indy!!!"}];
+    //here also, I'll get the token
     var url = "http://stark-ridge-5017.herokuapp.com/adventures";
     $.ajax({
       type: "GET",
@@ -86,6 +88,7 @@ var Adventures = React.createClass({
   //TODO, review this code looks a bit prolematic
   start: function (title, id) {
      this.setState({startAdventure: true, title: title,
+                    passed_up_token: token,
                     passed_up_id: id }); 
   },
 
@@ -98,6 +101,7 @@ var Adventures = React.createClass({
     var adventures = this.state.adventures.map(function(a) {
           return <Adventure name={a.title} 
                             id={a.id} 
+                            token={a.token} 
                             description={a.description} 
                             rating={a.average_rating} 
                             start={this.start} />; 
@@ -111,6 +115,7 @@ var Adventures = React.createClass({
     if (this.state.startAdventure) {
       return <PlayAdventure include_final={true}
                             adventure_id={this.state.passed_up_id}
+                            adventure_token={this.state.passed_up_token}
                             name= {this.state.title} 
                              />;
     }

@@ -24,8 +24,9 @@ var PlayAdventure = React.createClass({
     //TODO ajax request to details including questions
     //off the challenge ID
     //questions and riddles
+    //pass the token as well
     $.ajax({
-      url: "http://stark-ridge-5017.herokuapp.com/adventures/"+this.props.adventure_id+".json",
+      url: "http://stark-ridge-5017.herokuapp.com/adventures/id="+this.props.adventure_id+"&token="+this.props.adventure_token+".json",
       method: "GET",
       success: function(data){
         console.log("here are the details of adventure >>>>>>>>>>>>>>>>>");
@@ -137,7 +138,10 @@ var PlayAdventure = React.createClass({
       return <div> You are done </div>;
     }
     else if (this.state.restart) {
-      return <PlayAdventure include_final={true} adventure_id={this.props.adventure_id} name={this.props.name} />
+      return <PlayAdventure include_final={true} 
+                            adventure_id={this.props.adventure_id}
+                            adventure_token={this.props.adventure_token}
+                            name={this.props.name} />
     }
     else if (this.state.gameLoaded) {  //renders along with answers
       //here slide question form infront of map or along with it
