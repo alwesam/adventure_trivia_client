@@ -74,7 +74,7 @@ var Adventures = React.createClass({
     //for now just do the following
     //var data = [{"name": "Find the Holy Grail", "description": "Indy!!!"}];
     //here also, I'll get the token
-    var url = "http://stark-ridge-5017.herokuapp.com/adventures";
+    var url = "http://localhost:3000/adventures";
     $.ajax({
       type: "GET",
       url: url,
@@ -86,7 +86,7 @@ var Adventures = React.createClass({
   },
 
   //TODO, review this code looks a bit prolematic
-  start: function (title, id) {
+  start: function (title, id, token) {
      this.setState({startAdventure: true, title: title,
                     passed_up_token: token,
                     passed_up_id: id }); 

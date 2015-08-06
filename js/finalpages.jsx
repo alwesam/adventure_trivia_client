@@ -72,7 +72,7 @@ var FinalPage = React.createClass({
 
       var jsonData = {review: {rating: this.state.rating}};
 
-      var url = "http://stark-ridge-5017.herokuapp.com/adventures/"+this.props.adventure_id+"/reviews";
+      var url = "http://localhost:3000/adventures/"+this.props.adventure_id+"/reviews";
       
       $.ajax({
         type: "POST",

@@ -26,7 +26,7 @@ var PlayAdventure = React.createClass({
     //questions and riddles
     //pass the token as well
     $.ajax({
-      url: "http://stark-ridge-5017.herokuapp.com/adventures/id="+this.props.adventure_id+"&token="+this.props.adventure_token+".json",
+      url: "http://localhost:3000/adventures/"+this.props.adventure_id+"?token="+this.props.adventure_token,
       method: "GET",
       success: function(data){
         console.log("here are the details of adventure >>>>>>>>>>>>>>>>>");
