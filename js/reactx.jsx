@@ -86,7 +86,7 @@ var Adventures = React.createClass({
   },
 
   //TODO, review this code looks a bit prolematic
-  start: function (title, id) {
+  start: function (title, id, token) {
      this.setState({startAdventure: true, title: title,
                     passed_up_token: token,
                     passed_up_id: id }); 
