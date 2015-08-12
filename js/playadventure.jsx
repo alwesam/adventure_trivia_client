@@ -119,8 +119,6 @@ var PlayAdventure = React.createClass({
                          resetMap={this.state.resetMap} />;
     }
 
-    var monsterForm = <Monster />;
-
     var arr=[];
     for (var i = 0; i< this.state.hearts; i++)
       arr.push('');
@@ -132,7 +130,7 @@ var PlayAdventure = React.createClass({
     //here a giant if-else statement with showQuestions
 
     if (this.state.finalChallenge && this.props.include_final) { //after finish challenges
-      return <Monster adventure_id={this.props.adventure_id} name={this.props.name} />;
+      return <Monster adventure_id={this.props.adventure_id} adventure_token={this.props.adventure_token} name={this.props.name} />;
     }
     else if (this.state.finalChallenge) {
       return <div> You are done </div>;

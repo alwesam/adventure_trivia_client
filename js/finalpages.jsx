@@ -30,7 +30,7 @@ var Monster = React.createClass({
     var android   = <img width="200" border="5" src="img/android.png" onClick={this.gameWon}/>;
     var iphone    = <img width="200" border="5" src="img/iphone.png"  onClick={this.gameLost}/>;
     
-    var finalPage = <FinalPage adventure_id={this.props.adventure_id} name={this.props.name} won={this.state.won} />;
+    var finalPage = <FinalPage adventure_id={this.props.adventure_id} adventure_token={this.props.adventure_token} name={this.props.name} won={this.state.won} />;
 
     if (this.state.won || this.state.loss)
       return <div>{finalPage}</div>;
@@ -129,7 +129,10 @@ var FinalPage = React.createClass({
     if (this.state.home)
       return <HomePage />
     else if (this.state.playAgain) {
-      return <PlayAdventure include_final={true} adventure_id={this.props.adventure_id} name={this.props.name} />
+        return <PlayAdventure include_final={true} 
+                              adventure_id={this.props.adventure_id} 
+                              adventure_token={this.props.adventure_token} 
+                              name={this.props.name} />
     }
     else if (this.props.won)
       return <div className="text-center closing-page">
