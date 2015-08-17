@@ -132,11 +132,8 @@ var Adventures = React.createClass({
                </div>
              </div>;
     }
-    else 
+    else if (this.state.adventures.length < 1 && this.state.showSpinner == false)
       return <div className="create-page">
-               <div style={spinnerStyle} className="text-center">
-                 <h2>Loading...</h2>
-               </div>
                <div className="text-center">
                  <h2> No adventure created yet. Create your own <a href="#" onClick={this.create}>Adventure!</a></h2>
                </div>
