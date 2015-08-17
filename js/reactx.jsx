@@ -122,7 +122,7 @@ var Adventures = React.createClass({
     else if (this.state.createAdventure) {
       return <CreateAdventure />;
     }
-    else if (this.state.adventures.length > 0) { //render a list
+    else { //render a list
       return <div className="create-page">
                <div style={spinnerStyle} className="text-center">
                  <h2>Loading...</h2>
@@ -132,12 +132,12 @@ var Adventures = React.createClass({
                </div>
              </div>;
     }
-    else if (this.state.adventures.length < 1 && this.state.showSpinner == false)
+    /*else if (this.state.adventures.length < 1 && this.state.showSpinner == false)
       return <div className="create-page">
                <div className="text-center">
                  <h2> No adventure created yet. Create your own <a href="#" onClick={this.create}>Adventure!</a></h2>
                </div>
-             </div>;
+             </div>;*/
        
   }
 
