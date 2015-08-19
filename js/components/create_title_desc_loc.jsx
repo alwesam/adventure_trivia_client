@@ -1,3 +1,6 @@
+var Router = window.ReactRouter;
+var Link = Router.Link;
+
 var CreateOverview = React.createClass({
   getInitialState: function () {
     return {
@@ -8,45 +11,22 @@ var CreateOverview = React.createClass({
             };
   },
 
-  componentDidMount: function () {
-
-    //$('.locsBox').select2({
-    //  placeholder: "select a place"
-    //});
-
-    //TODO find a solution
-    //this.setState({ autocomplete: new google.maps.places.Autocomplete(
-    //  /** @type {HTMLInputElement} */(this.refs.locInput.getDOMNode()),
-    //  { types: ['geocode'] }) }); 
-
-  },
-
   nameInput: function () {
     this.setState({adventureTitle: this.refs.nameInput.getDOMNode().value}); 
   },
 
   locInput: function () {
-
-    //TODO fix
-    //jquery chosen way??
-    //var locString = this.refs.locInput.getDOMNode().value; 
-    //var locString = this.refs.locInput.getDOMNode().chosen(); 
-
     var locString = this.refs.locInput.getDOMNode().value; 
-    
     this.setState({adventureLocations: locString.trim().split(";") }); 
-    //this.setState({adventureLocations: locString }); 
-
   },
 
   descInput: function () {
     this.setState({adventureDescription: this.refs.descInput.getDOMNode().value}); 
-    //console.log(this.state.adventureDescription);
   },
 
   isReady: function () {
     return (this.state.adventureTitle.length > 0 &&
-            this.state.adventureDescription.length >0 &&
+            this.state.adventureDescription.length > 0 &&
             this.state.adventureLocations.length > 0); 
   },
 
@@ -54,7 +34,6 @@ var CreateOverview = React.createClass({
     this.props.pass(this.state.adventureTitle,
                     this.state.adventureDescription,
                     this.state.adventureLocations);
-    console.log("passed locations: "+this.state.adventureLocations);
   },
 
   render: function () {
@@ -72,11 +51,14 @@ var CreateOverview = React.createClass({
                   </div>;  
 
     //TODO style as next button
+    var saveButton = <div className="form-group">
+                         <input type="submit" className="form-control" value="Save" onClick={this.onSubmit} disabled={!this.isReady()} />
+                     </div>;
     var nextButton = <div className="form-group">
-                         <input type="submit" className="form-control" value="Next" onClick={this.onSubmit} disabled={!this.isReady()} />
-                       </div>;
+                       <Link to="create_challenges"><input type="submit" className="form-control" value="Next" disabled={!this.isReady()} /></Link>
+                     </div>;
     //giant if-else statement here to render different views depending on state
-    return <div className="form">{name} {description} {locsBox} {nextButton}</div>;
+    return <div className="form">{name} {description} {locsBox} {saveButton} {nextButton}</div>;
   
   }
 

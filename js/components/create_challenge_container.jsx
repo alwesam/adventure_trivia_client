@@ -1,11 +1,11 @@
 var CreateChallenges = React.createClass({
 
   getInitialState: function () {
-    return {stage: 0, challenges: []}; //number of stages correspond to number of locations here 
+    return {stage: 0, challenges: [], didPass: false}; //number of stages correspond to number of locations here 
   },
 
   componentDidUpdate: function (prevState, nexState) {
-   if (this.state.stage != prevState.stage && 
+   if (this.state.stage != prevState.stage && !this.state.didPass && 
        this.state.stage === this.props.locs.length)
         this.pass(); 
   },
@@ -22,7 +22,9 @@ var CreateChallenges = React.createClass({
 
   pass: function () {
     //pass challenges array to parent create_container 
-    this.props.pass(this.state.challenges);
+    this.props.pass_challenges(this.state.challenges);
+    //to prevent overflowing
+    this.setState({didPass: true});
   },
 
   render: function () {

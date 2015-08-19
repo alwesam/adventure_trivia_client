@@ -1,15 +1,10 @@
+var Router = window.ReactRouter;
+var Link = Router.Link;
+
 var Monster = React.createClass({
 
   getInitialState: function () {
-    return {won: false, loss: false, choose: false};
-  },
-
-  gameWon: function () {
-    this.setState({won: true});
-  },
-
-  gameLost: function () {
-    this.setState({loss: true});
+    return {choose: false};
   },
 
   choose: function () {
@@ -27,14 +22,10 @@ var Monster = React.createClass({
                     </div>
                   </div>;
 
-    var android   = <img width="200" border="5" src="img/android.png" onClick={this.gameWon}/>;
-    var iphone    = <img width="200" border="5" src="img/iphone.png"  onClick={this.gameLost}/>;
+    var android   = <Link to="finalpage" params={{id: this.props.id}} query={{won: "true"}} ><img width="200" border="5" src="img/android.png" /></Link>;
+    var iphone    = <Link to="finalpage" params={{id: this.props.id}} query={{won: "false"}}><img width="200" border="5" src="img/iphone.png"  /></Link>;
     
-    var finalPage = <FinalPage adventure_id={this.props.adventure_id} adventure_token={this.props.adventure_token} name={this.props.name} won={this.state.won} />;
-
-    if (this.state.won || this.state.loss)
-      return <div>{finalPage}</div>;
-    else if (this.state.choose)
+    if (this.state.choose)
       return <div className="text-center final-page">
               <h1> Choose Wisely </h1>
               <div className="finalpage-box">
@@ -55,25 +46,14 @@ var Monster = React.createClass({
 var FinalPage = React.createClass({
 
   getInitialState: function () {
-      return {home: false, playAgain: false, audio: new Audio('music/indiana.wav'),
-              rating: 0, ratingText: "Choose a rating"};
-  },
-
-  componentWillReceiveProps: function () {
-  //TODO fix later
-  //if (this.props.won)
-  //    this.state.audio.play();
+      return {rating: 0, ratingText: "Choose a rating"};
   },
 
   componentDidUpdate: function (prevState) {
     //do an ajax post request to send reviews
- 
     if (prevState.rating != this.state.rating) { 
-
       var jsonData = {review: {rating: this.state.rating}};
-
-      var url = "http://localhost:3000/adventures/"+this.props.adventure_id+"/reviews";
-      
+      var url = "http://localhost:3000/adventures/"+this.props.params.id+"/reviews";
       $.ajax({
         type: "POST",
         url: url,
@@ -82,27 +62,16 @@ var FinalPage = React.createClass({
           console.log("AJAX request POST result: "+data);
         }.bind(this)
       });
-
     }
-
   },
 
   rate: function (value) {
-    this.setState({rating: value});
-    this.setState({ratingText: value+" stars"});
+    this.setState({rating: value, ratingText: value+" stars"});
   },
   
   postReview: function(value) {
     //make a post request to post review 
   }, 
-
-  goHome: function () {
-    this.setState({home: true});
-  },
-
-  playAgain: function () {
-    this.setState({playAgain: true});
-  },
 
   render: function(){
 
@@ -122,19 +91,11 @@ var FinalPage = React.createClass({
                  </span>;
 
     //TODO 
-    //var inviteFriends = <h4><a href="#">Invite your friends</a></h4>;
-    var home = <h3><a href="#" onClick={this.goHome}> Home </a></h3>;
-    var playAgain = <h3><a href="#" onClick={this.playAgain}> Play Again </a></h3>;
+    //var inviteFriends = <h4><Link><a href="#">Invite your friends</a></Link></h4>;
+    var home = <h3><Link to="/"> Home </Link></h3>;
+    var playAgain = <h3><Link to="/play"> Play Again </Link></h3>;
 
-    if (this.state.home)
-      return <HomePage />
-    else if (this.state.playAgain) {
-        return <PlayAdventure include_final={true} 
-                              adventure_id={this.props.adventure_id} 
-                              adventure_token={this.props.adventure_token} 
-                              name={this.props.name} />
-    }
-    else if (this.props.won)
+    if (this.props.query.won === "true")
       return <div className="text-center closing-page">
             {image_wisely}
             {treasure}

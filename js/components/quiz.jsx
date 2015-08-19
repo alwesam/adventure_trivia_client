@@ -1,3 +1,6 @@
+var Router = window.ReactRouter;
+var Link = Router.Link;
+
 var Answer = React.createClass({
   logCheck: function () {
     if(this.refs.radioInput.getDOMNode().checked)
@@ -87,20 +90,7 @@ var Quiz = React.createClass({
         
   },
 
-  //got it from stackoverflow
-  makeid: function () {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 10; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-  },
-
   questionSolved: function () {
-    //here call playadventure which calls map and marker to move into the next
-    //question 
-    //TODO do some work here for pattern matching
-    //this.props.questionDone(this.makeid());
     this.props.questionDone(this.props.quiz[this.state.questionIndex].content);
   },
 
@@ -140,13 +130,7 @@ var Quiz = React.createClass({
     }
   },
   
-  reStart: function () {
-    this.props.gameOver();
-  },
-
   render: function() {
-
-    console.log("current question stage.>>>>>>>>>>>>>>> "+this.state.questionIndex);
 
     var qObj = this.props.quiz[this.state.questionIndex];
     var qtext = qObj.content; //return a string
@@ -170,10 +154,10 @@ var Quiz = React.createClass({
     var find_ruby = <div className="text-center"> Let's find some rubies. </div>;
     var next_ruby = <div className="text-center"> Awesome, find the next ruby. Embrace the adventure. </div>;
 
-    var gameover = <div> GAME OVER <h4><a href="#" onClick={this.reStart}>Restart</a></h4></div>
+    var gameover = <div> GAME OVER <h4><Link to="/play">Restart</Link></h4></div>
 
     var riddle = (this.props.finalStage) ? <h4> You are getting close. Solve this riddle and you will be faced with the final challenge </h4> : 
-                                            <h4> Solve riddle to move on to your next adventure location</h4>;
+                                           <h4> Solve riddle to move on to your next adventure location</h4>;
 
     if(this.state.gameOver)
       return gameover;
