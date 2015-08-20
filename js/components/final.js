@@ -12,7 +12,7 @@ var FinalPage = React.createClass({
     //do an ajax post request to send reviews
     if (prevState.rating != this.state.rating) { 
       var jsonData = {review: {rating: this.state.rating}};
-      var url = "http://localhost:3000/adventures/"+this.props.params.id+"/reviews";
+      var url = "http://stark-ridge-5017.herokuapp.com/adventures/"+this.props.params.id+"/reviews";
       $.ajax({
         type: "POST",
         url: url,

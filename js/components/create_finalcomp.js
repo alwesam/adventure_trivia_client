@@ -10,7 +10,7 @@ var CreateFinalComp = React.createClass({
 
     console.log("JSON DATA: ");
     console.log(jsonData);
-    var url ="http://localhost:3000/adventures"; 
+    var url ="http://stark-ridge-5017.herokuapp.com/adventures"; 
     
     $.ajax({
       type: "POST",

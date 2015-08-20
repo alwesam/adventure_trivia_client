@@ -25,7 +25,7 @@ var PlayAdventure = React.createClass({
     var id = this.props.params.id;
     var token = this.props.query.token;
     $.ajax({
-      url: "http://localhost:3000/adventures/"+id+"?token="+token,
+      url: "http://stark-ridge-5017.herokuapp.com/adventures/"+id+"?token="+token,
       method: "GET",
       success: function(data){
         this.setState({
