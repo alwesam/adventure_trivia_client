@@ -53,3 +53,5 @@ var CreateAdventure = React.createClass({
 
   }
 });
+
+export default CreateAdventure;

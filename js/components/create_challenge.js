@@ -1,3 +1,8 @@
+import React from 'react';  
+
+import CreateQuestionsContainer from './create_questions.js';
+import CreateRiddle from './create_riddle.js';
+
 var CreateChallenge = React.createClass({
   getInitialState: function () {
     return {stage: 0, questions: [],
@@ -6,7 +11,6 @@ var CreateChallenge = React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
-    console.log("updating prop loc "+this.props.loc);
     if (nextProps.loc != this.props.loc)
       this.setState({stage: 0}); 
   },
@@ -53,3 +57,5 @@ var CreateChallenge = React.createClass({
   }
 
 });
+
+export default CreateChallenge;

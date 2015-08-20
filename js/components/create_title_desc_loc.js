@@ -1,5 +1,6 @@
-var Router = window.ReactRouter;
-var Link = Router.Link;
+import React from 'react';  
+import Router from 'react-router';  
+import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
 
 var CreateOverview = React.createClass({
   getInitialState: function () {
@@ -45,21 +46,26 @@ var CreateOverview = React.createClass({
                         <textarea name="description" placeholder="Enter a description" ref="descInput" onChange={this.descInput} className="form-control" />
                       </div>;  
     var locsBox = <div className="form-group">
-                    <textarea className="locsBox" name="locations" 
+                    <textarea name="locations" 
                               placeholder="Enter Locations separated by semicolon" 
                               ref="locInput" onChange={this.locInput} className="form-control"/>
                   </div>;  
 
+    
+    
     //TODO style as next button
     var saveButton = <div className="form-group">
                          <input type="submit" className="form-control" value="Save" onClick={this.onSubmit} disabled={!this.isReady()} />
                      </div>;
+
     var nextButton = <div className="form-group">
                        <Link to="create_challenges"><input type="submit" className="form-control" value="Next" disabled={!this.isReady()} /></Link>
                      </div>;
-    //giant if-else statement here to render different views depending on state
+
     return <div className="form">{name} {description} {locsBox} {saveButton} {nextButton}</div>;
-  
+
   }
 
 });
+
+export default CreateOverview;

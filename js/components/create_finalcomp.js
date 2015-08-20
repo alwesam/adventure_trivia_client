@@ -1,3 +1,5 @@
+import React from 'react';
+
 var CreateFinalComp = React.createClass({
 
   onSubmit: function () {
@@ -52,3 +54,5 @@ var CreateFinalComp = React.createClass({
   }
 
 });
+
+export default CreateFinalComp;

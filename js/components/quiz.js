@@ -143,10 +143,10 @@ var Quiz = React.createClass({
 
     var quizform = <div>
              <h3>{this.props.loc}</h3>
-             <AutoForm onSubmit={this.handleSubmit}>
+             <form onSubmit={this.handleSubmit}>
                {question}
                <input type="submit" value="Submit"/>
-             </AutoForm>
+             </form>
              <div style={warning_style}>
               {this.state.warning}
              </div>

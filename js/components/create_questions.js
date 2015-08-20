@@ -1,3 +1,5 @@
+import React from 'react';
+
 var MakeAnswers = React.createClass({
 
   getInitialState: function(){
@@ -185,3 +187,5 @@ var CreateQuestionsContainer = React.createClass({
   }
 
 });
+
+export default CreateQuestionsContainer;

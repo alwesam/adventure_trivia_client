@@ -4,7 +4,7 @@ import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
 
 import Quiz from './quiz.js';
 import Map from './gmap.js';
-import Monster from './final.js';
+import Monster from './choose.js';
 
 //start the adventure, this will be a new page
 var PlayAdventure = React.createClass({

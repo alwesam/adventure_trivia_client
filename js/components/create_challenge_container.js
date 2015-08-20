@@ -1,3 +1,7 @@
+import React from 'react';  
+
+import CreateChallenge from './create_challenge.js';
+
 var CreateChallenges = React.createClass({
 
   getInitialState: function () {
@@ -11,13 +15,10 @@ var CreateChallenges = React.createClass({
   },
 
   addChallenge: function (challenge_obj) { //returns an object {address: "", questions: "", riddle: ""}
-
-      console.log("adding to challenge*** "+this.state.stage);
       var arr = this.state.challenges;
       arr.push(challenge_obj);
       this.setState({challenges: arr});
       this.setState({stage: this.state.stage+1});
-    
   },
 
   pass: function () {
@@ -34,3 +35,5 @@ var CreateChallenges = React.createClass({
   }
 
 });
+
+export default CreateChallenges;

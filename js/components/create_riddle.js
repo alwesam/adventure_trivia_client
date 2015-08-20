@@ -1,3 +1,5 @@
+import React from 'react';  
+
 var CreateRiddle = React.createClass({
   getInitialState: function () {
     return {riddle: "", solution: "", hint: ""};
@@ -58,3 +60,5 @@ var CreateRiddle = React.createClass({
   }
 
 });
+
+export default CreateRiddle;
