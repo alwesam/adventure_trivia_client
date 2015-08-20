@@ -1,5 +1,6 @@
-var Router = window.ReactRouter;
-var Link = Router.Link;
+import React from 'react';  
+import Router from 'react-router';  
+import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
 
 var Answer = React.createClass({
   logCheck: function () {
@@ -181,7 +182,7 @@ var Quiz = React.createClass({
     else {
       return find_ruby;
     }
-
   }
-
 });
+
+export default Quiz;

@@ -1,3 +1,11 @@
+import React from 'react';  
+import Router from 'react-router';  
+import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
+
+import Quiz from './quiz.js';
+import Map from './gmap.js';
+import Monster from './final.js';
+
 //start the adventure, this will be a new page
 var PlayAdventure = React.createClass({
 
@@ -125,3 +133,5 @@ var PlayAdventure = React.createClass({
     
   } 
 });
+
+export default PlayAdventure;

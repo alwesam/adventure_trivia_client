@@ -1,3 +1,5 @@
+import React from 'react';  
+
 var Marker = React.createClass({
 
   getInitialState: function () {
@@ -395,8 +397,6 @@ var Map = React.createClass({
 
   render: function () {
     
-    //I'm having a list of markers and I'm passing them the lat and lon and the
-    //map state
     if(this.props.resetMap)
        this.resetView();
     
@@ -415,14 +415,10 @@ var Map = React.createClass({
       markers = null;
     }
 
-    //I'm just puting markers there in order to have render on the map
-    //TODO fix style to make it responsive
     var style = {height: this.state.mapHeight, width: this.state.mapWidth};
-    //var button = <div id="panel" >
-    //                <input type="button" value="Toggle Street View" onClick={this.toggleStreetView}/>
-    //             </div>;
-
     return <div style={style} ref="map_canvas"> {markers} </div>;
   }
 
 });
+
+export default Map;

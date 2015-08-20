@@ -1,6 +1,6 @@
-var Router = window.ReactRouter;
-var Link = Router.Link;
-var RouteHandler = Router.RouteHandler;
+import React from 'react';  
+import Router from 'react-router';  
+import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
 
 var CreateAdventure = React.createClass({
 

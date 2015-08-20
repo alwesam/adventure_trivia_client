@@ -1,7 +1,7 @@
 //Note this will be part of the index page
-var Router = window.ReactRouter;
-var Link = Router.Link;
-var RouteHandler = Router.RouteHandler;
+import React from 'react';  
+import Router from 'react-router';  
+import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
 
 var Adventure = React.createClass({
 
@@ -102,3 +102,5 @@ var Adventures = React.createClass({
   }
 
 });
+
+export default Adventures;
