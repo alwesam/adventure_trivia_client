@@ -24962,7 +24962,7 @@
 	    var email = this.refs.email.getDOMNode().value;
 	    var password = this.refs.password.getDOMNode().value;
 	    var jsonData = { email: email, password: password };
-	    var url = "http://localhost:3000/login";
+	    var url = "http://stark-ridge-5017.herokuapp.com/login";
 
 	    $.ajax({
 	      type: "POST",
@@ -25583,7 +25583,7 @@
 	var CreateFinalComp = _react2["default"].createClass({
 	  displayName: "CreateFinalComp",
 
-	  onSubmit: function onSubmit(e) {
+	  onSubmit: function onSubmit() {
 	    //TODO
 	    var jsonData = { adventure: { title: this.props.title,
 	        description: this.props.description,
@@ -25591,7 +25591,7 @@
 
 	    console.log("JSON DATA: ");
 	    console.log(jsonData);
-	    var url = "http://localhost:3000/adventures";
+	    var url = "http://stark-ridge-5017.herokuapp.com/adventures";
 
 	    $.ajax({
 	      type: "POST",
@@ -25700,7 +25700,7 @@
 
 	  componentDidMount: function componentDidMount() {
 
-	    var url = "http://localhost:3000/adventures";
+	    var url = "http://stark-ridge-5017.herokuapp.com/adventures";
 	    $.ajax({
 	      type: "GET",
 	      url: url,
@@ -25791,7 +25791,7 @@
 	    var id = this.props.params.id;
 	    var token = this.props.query.token;
 	    $.ajax({
-	      url: "http://localhost:3000/adventures/" + id + "?token=" + token,
+	      url: "http://stark-ridge-5017.herokuapp.com/adventures/" + id + "?token=" + token,
 	      method: "GET",
 	      success: (function (data) {
 	        this.setState({
@@ -26566,7 +26566,7 @@
 	    //do an ajax post request to send reviews
 	    if (prevState.rating != this.state.rating) {
 	      var jsonData = { review: { rating: this.state.rating } };
-	      var url = "http://localhost:3000/adventures/" + this.props.params.id + "/reviews";
+	      var url = "http://stark-ridge-5017.herokuapp.com/adventures/" + this.props.params.id + "/reviews";
 	      $.ajax({
 	        type: "POST",
 	        url: url,
