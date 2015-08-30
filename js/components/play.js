@@ -33,6 +33,8 @@ var Adventure = React.createClass({
       var stars = <h5>Not Rated Yet</h5>
 
     if (this.state.detailsFetched) {
+      var black = {color: "black"};
+      var white = {color: "white"};
       return <div className="row adventure-item-details">
                 <div className="col-md-6">
                   <h3>{this.props.name}</h3>
@@ -41,10 +43,10 @@ var Adventure = React.createClass({
                 <div className="col-md-5">
                   <h4>{this.props.description}</h4>
                   <button className="btn btn-danger"><Link to="playadventure" params={{id: this.props.id}}
-                      query={{token: this.props.token, name: this.props.name}}>Play</Link></button>
+                      query={{token: this.props.token, name: this.props.name}} style={white}>Play</Link></button>
                 </div>
                 <div className="col-md-1">
-                  <button className="btn btn-link" href="#" onClick={this.hideDetails} >X</button>
+                  <button className="btn btn-link" style={black} href="#" onClick={this.hideDetails} >X</button>
                 </div>
               </div>;
     }

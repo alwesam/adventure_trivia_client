@@ -25680,8 +25680,10 @@
 	    });else var stars = _react2['default'].createElement('h5', null, 'Not Rated Yet');
 
 	    if (this.state.detailsFetched) {
+	      var black = { color: "black" };
+	      var white = { color: "white" };
 	      return _react2['default'].createElement('div', { className: 'row adventure-item-details' }, _react2['default'].createElement('div', { className: 'col-md-6' }, _react2['default'].createElement('h3', null, this.props.name), _react2['default'].createElement('div', null, stars)), _react2['default'].createElement('div', { className: 'col-md-5' }, _react2['default'].createElement('h4', null, this.props.description), _react2['default'].createElement('button', { className: 'btn btn-danger' }, _react2['default'].createElement(_reactRouter.Link, { to: 'playadventure', params: { id: this.props.id },
-	        query: { token: this.props.token, name: this.props.name } }, 'Play'))), _react2['default'].createElement('div', { className: 'col-md-1' }, _react2['default'].createElement('button', { className: 'btn btn-link', href: '#', onClick: this.hideDetails }, 'X')));
+	        query: { token: this.props.token, name: this.props.name }, style: white }, 'Play'))), _react2['default'].createElement('div', { className: 'col-md-1' }, _react2['default'].createElement('button', { className: 'btn btn-link', style: black, href: '#', onClick: this.hideDetails }, 'X')));
 	    } else {
 	      var style = { float: "left" };
 	      return _react2['default'].createElement('div', { className: 'adventure-item' }, _react2['default'].createElement('h3', null, _react2['default'].createElement('a', { href: '#/play', onClick: this.fetchDetails }, ' ', this.props.name)));
@@ -26516,7 +26518,7 @@
 	  },
 
 	  render: function render() {
-	    var monster = _react2['default'].createElement('div', { className: 'text-center final-page' }, _react2['default'].createElement('h2', null, 'You have braved many risks to get here and for this I salute you'), _react2['default'].createElement('img', { src: 'img/knight.png' }), _react2['default'].createElement('h2', null, 'However, before you get your hands on the treasure, you must pass the final challenge '), _react2['default'].createElement('h2', null, 'You must choose, but choose wisely'), _react2['default'].createElement('div', { className: 'accept-box' }, _react2['default'].createElement('button', { onClick: this.choose }, 'Accept Challenge')));
+	    var monster = _react2['default'].createElement('div', { className: 'text-center final-page' }, _react2['default'].createElement('h2', null, 'You have braved many risks to get here and for this I salute you'), _react2['default'].createElement('img', { src: 'img/knight.png' }), _react2['default'].createElement('h2', null, 'However, before you get your hands on the treasure, you must pass the final challenge '), _react2['default'].createElement('h2', null, 'You must choose, but choose wisely'), _react2['default'].createElement('div', { className: 'accept-box' }, _react2['default'].createElement('button', { className: 'btn btn-danger', onClick: this.choose }, 'Accept Challenge')));
 
 	    var android = _react2['default'].createElement(_reactRouter.Link, { to: 'finalpage', params: { id: this.props.id }, query: { won: "true" } }, _react2['default'].createElement('img', { width: '200', border: '5', src: 'img/android.png' }));
 	    var iphone = _react2['default'].createElement(_reactRouter.Link, { to: 'finalpage', params: { id: this.props.id }, query: { won: "false" } }, _react2['default'].createElement('img', { width: '200', border: '5', src: 'img/iphone.png' }));

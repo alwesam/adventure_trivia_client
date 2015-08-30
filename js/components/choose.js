@@ -19,7 +19,7 @@ var Monster = React.createClass({
                     <h2>However, before you get your hands on the treasure, you must pass the final challenge </h2>
                     <h2>You must choose, but choose wisely</h2>
                     <div className="accept-box">
-                      <button onClick={this.choose}>Accept Challenge</button>
+                      <button className="btn btn-danger" onClick={this.choose}>Accept Challenge</button>
                     </div>
                   </div>;
 

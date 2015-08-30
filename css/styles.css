@@ -13,7 +13,7 @@ html, body {height: 100%;}
 }
 
 .homepage-box img {
-  max-width: 500px;
+  max-width: 400px;
   min-width: 200px;
   margin-top: 50px;
   margin-bottom: 50px;
@@ -35,8 +35,6 @@ html, body {height: 100%;}
 
 .accept-box { 
   margin-top: 5%;
-  /*width: 50px;*/
-  color: rgb(120, 0, 0);
 };
 
 .accept-box button {
