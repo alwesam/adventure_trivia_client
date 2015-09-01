@@ -92,9 +92,9 @@ var PlayAdventure = React.createClass({
                          minusheart={this.minusheart}
                          finalStage={finalStage}
                          gameOver={this.gameOver}
-                         loc={loc} 
+                         loc  ={loc} 
                          quiz ={quiz} 
-                         clue={riddle} 
+                         clue = {riddle} 
                          clueHint={hint} 
                          clueAns={solution}/>;
 
@@ -122,7 +122,9 @@ var PlayAdventure = React.createClass({
       //here slide question form infront of map or along with it
       return <div className="question-map-box">
                 <div style={spinnerStyle} className="text-center">
-                  <h2>Loading...</h2>
+                  <div className="three-quarters-loader">
+                    <h2>Loading...</h2>
+                  </div>
                 </div>
                 <div className="name-box">{this.props.query.name}</div>
                 <div className="lives-box">{lives}</div>

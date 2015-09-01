@@ -152,7 +152,7 @@ var Quiz = React.createClass({
              </div>
           </div>;
 
-    var find_ruby = <div className="text-center"> Let's find some rubies. </div>;
+    var find_ruby = <div className="text-center"> Let us find some rubies. </div>;
     var next_ruby = <div className="text-center"> Awesome, find the next ruby. Embrace the adventure. </div>;
 
     var gameover = <div> GAME OVER <h4><Link to="/play">Restart</Link></h4></div>

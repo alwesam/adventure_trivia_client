@@ -95,7 +95,9 @@ var Adventures = React.createClass({
     
     return <div className="create-page">
              <div style={spinnerStyle} className="text-center">
-               <h2>Loading...</h2>
+               <div className="three-quarters-loader">
+                <h2>Loading...</h2>
+               </div>
              </div>
              <div className="adventures-list">
               {adventures}

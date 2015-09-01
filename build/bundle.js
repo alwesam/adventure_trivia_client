@@ -24953,6 +24953,10 @@
 	var Login = _react2['default'].createClass({
 	  displayName: 'Login',
 
+	  getInitialState: function getInitialState() {
+	    return { error: false };
+	  },
+
 	  onSubmit: function onSubmit(e) {
 
 	    //injected by connect
@@ -24970,6 +24974,7 @@
 	      data: jsonData,
 	      success: (function (data) {
 	        //store login information
+	        this.setState({ error: !data.success });
 	        if (data.success) {
 	          dispatch((0, _actionsActionsJs.login)());
 	          this.forceUpdate(); //not recommended but use for now
@@ -24980,7 +24985,11 @@
 
 	  render: function render() {
 	    //TODO fix
-	    if (this.props.store.getState()) return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('h4', null, _react2['default'].createElement(_reactRouter.Link, { to: 'create', store: this.props.store }, 'Create an Adventure')));else return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('div', { className: 'row col-lg-4' }, _react2['default'].createElement('h4', null, 'Please enter your login information'), _react2['default'].createElement('form', { role: 'form', onSubmit: this.onSubmit }, _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'email' }, 'Email'), _react2['default'].createElement('input', { className: 'form-control', type: 'text', name: 'email', ref: 'email' })), _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'password' }, 'Password'), _react2['default'].createElement('input', { className: 'form-control', type: 'password', name: 'password', ref: 'password' })), _react2['default'].createElement('button', { type: 'submit', className: 'btn btn-default' }, 'Login'))));
+	    var padding = { padding: 10 };
+	    var error_message = "";
+	    if (this.state.error) error_message = _react2['default'].createElement('h5', null, 'Login infomration is incorrect');
+
+	    if (this.props.store.getState()) return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('h4', null, _react2['default'].createElement(_reactRouter.Link, { to: 'create', store: this.props.store }, 'Create an Adventure')));else return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('div', { className: 'row col-lg-4' }, _react2['default'].createElement('h4', { style: padding }, 'Please enter your login information'), _react2['default'].createElement('br', null), _react2['default'].createElement('form', { role: 'form', onSubmit: this.onSubmit }, _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'email' }, 'Email'), _react2['default'].createElement('input', { className: 'form-control', type: 'text', name: 'email', ref: 'email' })), _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'password' }, 'Password'), _react2['default'].createElement('input', { className: 'form-control', type: 'password', name: 'password', ref: 'password' })), _react2['default'].createElement('button', { type: 'submit', className: 'btn btn-default' }, 'Login')), _react2['default'].createElement('div', null, error_message)));
 	  }
 	});
 
@@ -25734,7 +25743,7 @@
 	    var spinnerDisplay = this.state.showSpinner ? "block" : "none";
 	    var spinnerStyle = { display: spinnerDisplay };
 
-	    return _react2['default'].createElement('div', { className: 'create-page' }, _react2['default'].createElement('div', { style: spinnerStyle, className: 'text-center' }, _react2['default'].createElement('h2', null, 'Loading...')), _react2['default'].createElement('div', { className: 'adventures-list' }, adventures));
+	    return _react2['default'].createElement('div', { className: 'create-page' }, _react2['default'].createElement('div', { style: spinnerStyle, className: 'text-center' }, _react2['default'].createElement('div', { className: 'three-quarters-loader' }, _react2['default'].createElement('h2', null, 'Loading...'))), _react2['default'].createElement('div', { className: 'adventures-list' }, adventures));
 	  }
 
 	});
@@ -25893,7 +25902,7 @@
 	      return _react2['default'].createElement(_chooseJs2['default'], { id: this.props.params.id });
 	    } else {
 	      //here slide question form infront of map or along with it
-	      return _react2['default'].createElement('div', { className: 'question-map-box' }, _react2['default'].createElement('div', { style: spinnerStyle, className: 'text-center' }, _react2['default'].createElement('h2', null, 'Loading...')), _react2['default'].createElement('div', { className: 'name-box' }, this.props.query.name), _react2['default'].createElement('div', { className: 'lives-box' }, lives), _react2['default'].createElement('div', { className: 'question-box' }, quizForm), _react2['default'].createElement('div', null, mapForm));
+	      return _react2['default'].createElement('div', { className: 'question-map-box' }, _react2['default'].createElement('div', { style: spinnerStyle, className: 'text-center' }, _react2['default'].createElement('div', { className: 'three-quarters-loader' }, _react2['default'].createElement('h2', null, 'Loading...'))), _react2['default'].createElement('div', { className: 'name-box' }, this.props.query.name), _react2['default'].createElement('div', { className: 'lives-box' }, lives), _react2['default'].createElement('div', { className: 'question-box' }, quizForm), _react2['default'].createElement('div', null, mapForm));
 	    }
 	  }
 	});
@@ -26054,7 +26063,7 @@
 
 	    var quizform = _react2['default'].createElement('div', null, _react2['default'].createElement('h3', null, this.props.loc), _react2['default'].createElement('form', { onSubmit: this.handleSubmit }, question, _react2['default'].createElement('input', { type: 'submit', value: 'Submit' })), _react2['default'].createElement('div', { style: warning_style }, this.state.warning));
 
-	    var find_ruby = _react2['default'].createElement('div', { className: 'text-center' }, ' Let\'s find some rubies. ');
+	    var find_ruby = _react2['default'].createElement('div', { className: 'text-center' }, ' Let us find some rubies. ');
 	    var next_ruby = _react2['default'].createElement('div', { className: 'text-center' }, ' Awesome, find the next ruby. Embrace the adventure. ');
 
 	    var gameover = _react2['default'].createElement('div', null, ' GAME OVER ', _react2['default'].createElement('h4', null, _react2['default'].createElement(_reactRouter.Link, { to: '/play' }, 'Restart')));
