@@ -16,6 +16,7 @@ var Home = React.createClass({
                        <img src="img/background.jpg" />
                        <h3><Link to="play">Play an Adventure</Link></h3>
                        {create} 
+                       <RouteHandler store={this.props.store} />
                    </div>;
      return  homePage;
   }

@@ -19,11 +19,6 @@ var Marker = React.createClass({
 
   componentWillReceiveProps: function (nextProps) {
  
-    console.log("current loc>>>>>: "+this.props.loc);
-    console.log("next loc>>>>>: "+nextProps.loc);
-    console.log("current stop>>>>>: "+this.props.nextStop);
-    console.log("next stop>>>>>: "+nextProps.nextStop);
-
     if (nextProps.loc != this.props.loc) {
       this.setState({currentLoc: nextProps.loc});
     }
@@ -62,7 +57,6 @@ var Marker = React.createClass({
 
       this.setState({currentMarker: this.addMarker(null)});
       //establish a new bound
-      console.log("establishing a new bound at >>>>>>>>>>>>>>>>"+this.props.loc);
       this.setState({currentBounds: new google.maps.LatLngBounds(new google.maps.LatLng(this.props.lat, this.props.lng))});
     }
     else { 
@@ -121,7 +115,6 @@ var Marker = React.createClass({
   decodeTarget: function () { 
     
     var landmark = this.state.nextStop;// not being used for now 
-    console.log("landmark passed is: "+landmark);
     var service = new google.maps.places.PlacesService(this.props.map);        
     var request = {location: this.state.currentMarker.getPosition(), 
                    radius: 5000 //5 km 
@@ -129,7 +122,7 @@ var Marker = React.createClass({
 
     service.nearbySearch(request, function (results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-          console.log("this is how much results I'm getting "+results.length);
+          //console.log("this is how much results I'm getting "+results.length);
           var rand = Math.floor(Math.random()*results.length-1);
           if(this.state.selectRand === rand && rand < results.length-1)
               rand++;
@@ -255,13 +248,11 @@ var Marker = React.createClass({
 
           if (safety < 5) {
             safety += 1;
-            console.log("trying: "+safety);
             streetViewMaxDistance = streetViewMaxDistance*2;
             //try again
             streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
           } else {
-            //this.setState({markerStatus: "Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters"});
-            console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters");
+            //console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters");
             addGem(point.lat(), point.lng(), "");
           }
           
@@ -356,13 +347,12 @@ var Map = React.createClass({
     var bounds;
 
     if (inbounds != null){
-      console.log("extending locally");
-      console.log(inbounds);
+      //console.log("extending locally");
       bounds = inbounds 
       //zoom_level = 15;
     }
     else{
-      console.log("extending globally");
+      //console.log("extending globally");
       bounds = this.state.mapBounds;
       //zoom_level = 8;
     }
@@ -375,9 +365,6 @@ var Map = React.createClass({
     //TODO initial map zooming is not working properly
     if (map.getZoom() > 15)
       map.setZoom(15);
-
-    console.log("zooooooooooooooming");
-    console.log("zoom level "+map.getZoom());
 
     if(inbounds == null)
       this.setState({map: map, mapBounds: bounds});

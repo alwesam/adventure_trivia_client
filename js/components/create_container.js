@@ -1,6 +1,8 @@
 import React from 'react';  
 import Router from 'react-router';  
 import { DefaultRoute, Link, Route, RouteHandler } from 'react-router';
+import { connect } from 'react-redux';
+import Login from './login.js';
 
 var CreateAdventure = React.createClass({
 
@@ -34,24 +36,31 @@ var CreateAdventure = React.createClass({
   },
 
   render: function () {
+
+        //TODO this is a temp quick fix
+        if(!this.props.store.getState())
+          //TODO not the best solution
+          return <Login store={this.props.store} />;
+
+        else
       
-        return <div className="create-page"> 
-                  <div className="row"> 
-                   <div className="col-md-4 col-md-offset-4">
-                     <Link to="create_overview" > Overview </Link> |
-                     <Link to="create_challenges" >Challenges</Link> |
-                     <Link to="create_final" >Final Step </Link> |
-                     <RouteHandler pass={this.receiveOverview} 
-                       locs={this.state.locations} 
-                       pass_challenges ={this.receiveChallenges}
-                       title={this.state.title}
-                       description={this.state.description}
-                       challenges={this.state.challenges}/>
+          return <div className="create-page"> 
+                    <div className="row"> 
+                     <div className="col-md-4 col-md-offset-4">
+                       <Link to="create_overview" > Overview </Link> |
+                       <Link to="create_challenges" >Challenges</Link> |
+                       <Link to="create_final" >Final Step </Link> |
+                       <RouteHandler pass={this.receiveOverview} 
+                         locs={this.state.locations} 
+                         pass_challenges ={this.receiveChallenges}
+                         title={this.state.title}
+                         description={this.state.description}
+                         challenges={this.state.challenges}/>
+                     </div>
                    </div>
-                 </div>
-              </div>;
+                </div>;
 
   }
 });
 
-export default CreateAdventure;
+export default connect()(CreateAdventure);

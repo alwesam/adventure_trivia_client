@@ -24910,7 +24910,7 @@
 	    var create = "";
 	    if (this.props.store.getState()) create = _react2['default'].createElement('h3', null, _react2['default'].createElement(_reactRouter.Link, { to: 'create' }, 'Create an Adventure'));else create = _react2['default'].createElement('h3', null, _react2['default'].createElement(_reactRouter.Link, { to: 'login' }, 'Login'), ' to create your own adventure');
 
-	    var homePage = _react2['default'].createElement('div', { className: 'text-center homepage-box' }, _react2['default'].createElement('h1', null, 'Welcome to Adventure Trivia'), _react2['default'].createElement('img', { src: 'img/background.jpg' }), _react2['default'].createElement('h3', null, _react2['default'].createElement(_reactRouter.Link, { to: 'play' }, 'Play an Adventure')), create);
+	    var homePage = _react2['default'].createElement('div', { className: 'text-center homepage-box' }, _react2['default'].createElement('h1', null, 'Welcome to Adventure Trivia'), _react2['default'].createElement('img', { src: 'img/background.jpg' }), _react2['default'].createElement('h3', null, _react2['default'].createElement(_reactRouter.Link, { to: 'play' }, 'Play an Adventure')), create, _react2['default'].createElement(_reactRouter.RouteHandler, { store: this.props.store }));
 	    return homePage;
 	  }
 	});
@@ -24971,7 +24971,6 @@
 	      success: (function (data) {
 	        //store login information
 	        if (data.success) {
-	          console.log("authentication " + data.success);
 	          dispatch((0, _actionsActionsJs.login)());
 	          this.forceUpdate(); //not recommended but use for now
 	        }
@@ -24981,8 +24980,7 @@
 
 	  render: function render() {
 	    //TODO fix
-	    console.log("I'm rendering....");
-	    if (this.props.store.getState()) return _react2['default'].createElement('h3', null, _react2['default'].createElement(_reactRouter.Link, { to: 'create' }, 'Create an Adventure'));else return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('div', { className: 'row col-lg-4' }, _react2['default'].createElement('form', { role: 'form', onSubmit: this.onSubmit }, _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'email' }, 'Email'), _react2['default'].createElement('input', { className: 'form-control', type: 'text', name: 'email', ref: 'email' })), _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'password' }, 'Password'), _react2['default'].createElement('input', { className: 'form-control', type: 'password', name: 'password', ref: 'password' })), _react2['default'].createElement('button', { type: 'submit', className: 'btn btn-default' }, 'Login'))));
+	    if (this.props.store.getState()) return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('h4', null, _react2['default'].createElement(_reactRouter.Link, { to: 'create', store: this.props.store }, 'Create an Adventure')));else return _react2['default'].createElement('div', { className: 'container' }, _react2['default'].createElement('div', { className: 'row col-lg-4' }, _react2['default'].createElement('h4', null, 'Please enter your login information'), _react2['default'].createElement('form', { role: 'form', onSubmit: this.onSubmit }, _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'email' }, 'Email'), _react2['default'].createElement('input', { className: 'form-control', type: 'text', name: 'email', ref: 'email' })), _react2['default'].createElement('div', { className: 'form-group' }, _react2['default'].createElement('label', { name: 'password' }, 'Password'), _react2['default'].createElement('input', { className: 'form-control', type: 'password', name: 'password', ref: 'password' })), _react2['default'].createElement('button', { type: 'submit', className: 'btn btn-default' }, 'Login'))));
 	  }
 	});
 
@@ -25014,6 +25012,12 @@
 	var _reactRouter = __webpack_require__(158);
 
 	var _reactRouter2 = _interopRequireDefault(_reactRouter);
+
+	var _reactRedux = __webpack_require__(206);
+
+	var _loginJs = __webpack_require__(218);
+
+	var _loginJs2 = _interopRequireDefault(_loginJs);
 
 	var CreateAdventure = _react2['default'].createClass({
 	  displayName: 'CreateAdventure',
@@ -25049,7 +25053,10 @@
 
 	  render: function render() {
 
-	    return _react2['default'].createElement('div', { className: 'create-page' }, _react2['default'].createElement('div', { className: 'row' }, _react2['default'].createElement('div', { className: 'col-md-4 col-md-offset-4' }, _react2['default'].createElement(_reactRouter.Link, { to: 'create_overview' }, ' Overview '), ' |', _react2['default'].createElement(_reactRouter.Link, { to: 'create_challenges' }, 'Challenges'), ' |', _react2['default'].createElement(_reactRouter.Link, { to: 'create_final' }, 'Final Step '), ' |', _react2['default'].createElement(_reactRouter.RouteHandler, { pass: this.receiveOverview,
+	    //TODO this is a temp quick fix
+	    if (!this.props.store.getState())
+	      //TODO not the best solution
+	      return _react2['default'].createElement(_loginJs2['default'], { store: this.props.store });else return _react2['default'].createElement('div', { className: 'create-page' }, _react2['default'].createElement('div', { className: 'row' }, _react2['default'].createElement('div', { className: 'col-md-4 col-md-offset-4' }, _react2['default'].createElement(_reactRouter.Link, { to: 'create_overview' }, ' Overview '), ' |', _react2['default'].createElement(_reactRouter.Link, { to: 'create_challenges' }, 'Challenges'), ' |', _react2['default'].createElement(_reactRouter.Link, { to: 'create_final' }, 'Final Step '), ' |', _react2['default'].createElement(_reactRouter.RouteHandler, { pass: this.receiveOverview,
 	      locs: this.state.locations,
 	      pass_challenges: this.receiveChallenges,
 	      title: this.state.title,
@@ -25058,7 +25065,7 @@
 	  }
 	});
 
-	exports['default'] = CreateAdventure;
+	exports['default'] = (0, _reactRedux.connect)()(CreateAdventure);
 	module.exports = exports['default'];
 
 	/* REACT HOT LOADER */ }).call(this); if (false) { (function () { module.hot.dispose(function (data) { data.makeHot = module.makeHot; }); if (module.exports && module.makeHot) { var makeExportsHot = require("/home/alwesam/finalproject/adventure_trivia_client/node_modules/react-hot-loader/makeExportsHot.js"), foundReactClasses = false; if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot not apply hot update to " + "create_container.js" + ": " + err.message); } }); } } })(); }
@@ -26112,11 +26119,6 @@
 
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 
-	    console.log("current loc>>>>>: " + this.props.loc);
-	    console.log("next loc>>>>>: " + nextProps.loc);
-	    console.log("current stop>>>>>: " + this.props.nextStop);
-	    console.log("next stop>>>>>: " + nextProps.nextStop);
-
 	    if (nextProps.loc != this.props.loc) {
 	      this.setState({ currentLoc: nextProps.loc });
 	    }
@@ -26148,7 +26150,6 @@
 
 	      this.setState({ currentMarker: this.addMarker(null) });
 	      //establish a new bound
-	      console.log("establishing a new bound at >>>>>>>>>>>>>>>>" + this.props.loc);
 	      this.setState({ currentBounds: new google.maps.LatLngBounds(new google.maps.LatLng(this.props.lat, this.props.lng)) });
 	    } else {
 	      if (prevState.nextStop != this.state.nextStop) this.decodeTarget();
@@ -26203,7 +26204,6 @@
 	  decodeTarget: function decodeTarget() {
 
 	    var landmark = this.state.nextStop; // not being used for now
-	    console.log("landmark passed is: " + landmark);
 	    var service = new google.maps.places.PlacesService(this.props.map);
 	    var request = { location: this.state.currentMarker.getPosition(),
 	      radius: 5000 //5 km
@@ -26211,7 +26211,7 @@
 
 	    service.nearbySearch(request, (function (results, status) {
 	      if (status == google.maps.places.PlacesServiceStatus.OK) {
-	        console.log("this is how much results I'm getting " + results.length);
+	        //console.log("this is how much results I'm getting "+results.length);
 	        var rand = Math.floor(Math.random() * results.length - 1);
 	        if (this.state.selectRand === rand && rand < results.length - 1) rand++;else if (this.state.selectRand === rand && rand > 0) rand--;
 	        this.setState({ gem: this.addMarker(results[rand]) });
@@ -26322,13 +26322,11 @@
 
 	        if (safety < 5) {
 	          safety += 1;
-	          console.log("trying: " + safety);
 	          streetViewMaxDistance = streetViewMaxDistance * 2;
 	          //try again
 	          streetViewService.getPanoramaByLocation(point, streetViewMaxDistance, getPanorama);
 	        } else {
-	          //this.setState({markerStatus: "Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters"});
-	          console.log("Sorry, couldn't find panorama view within" + streetViewMaxDistance + "meters");
+	          //console.log("Sorry, couldn't find panorama view within"+streetViewMaxDistance+"meters");
 	          addGem(point.lat(), point.lng(), "");
 	        }
 	      }
@@ -26419,12 +26417,11 @@
 	    var bounds;
 
 	    if (inbounds != null) {
-	      console.log("extending locally");
-	      console.log(inbounds);
+	      //console.log("extending locally");
 	      bounds = inbounds;
 	      //zoom_level = 15;
 	    } else {
-	        console.log("extending globally");
+	        //console.log("extending globally");
 	        bounds = this.state.mapBounds;
 	        //zoom_level = 8;
 	      }
@@ -26436,9 +26433,6 @@
 
 	    //TODO initial map zooming is not working properly
 	    if (map.getZoom() > 15) map.setZoom(15);
-
-	    console.log("zooooooooooooooming");
-	    console.log("zoom level " + map.getZoom());
 
 	    if (inbounds == null) this.setState({ map: map, mapBounds: bounds });
 	  },
@@ -26574,7 +26568,7 @@
 	        url: url,
 	        data: jsonData,
 	        success: (function (data) {
-	          console.log("AJAX request POST result: " + data);
+	          //console.log("AJAX request POST result: "+data);
 	        }).bind(this)
 	      });
 	    }

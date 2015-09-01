@@ -24,7 +24,6 @@ var Login = React.createClass({
       success: function (data) {
         //store login information
         if(data.success){
-          console.log("authentication "+data.success);
           dispatch(login());
           this.forceUpdate(); //not recommended but use for now
         } 
@@ -35,13 +34,13 @@ var Login = React.createClass({
   
   render: function() {
     //TODO fix
-    console.log("I'm rendering....");
     if(this.props.store.getState())
-      return <h3><Link to="create">Create an Adventure</Link></h3>;
+      return <div className="container"><h4><Link to="create" store={this.props.store}>Create an Adventure</Link></h4></div>;
     else
       return (
         <div className="container">
         <div className="row col-lg-4">
+          <h4>Please enter your login information</h4>
           <form role="form" onSubmit={this.onSubmit}>
             <div className="form-group">
               <label name="email">Email</label>

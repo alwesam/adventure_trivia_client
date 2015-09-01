@@ -18,7 +18,7 @@ var FinalPage = React.createClass({
         url: url,
         data: jsonData,
         success: function (data) {
-          console.log("AJAX request POST result: "+data);
+          //console.log("AJAX request POST result: "+data);
         }.bind(this)
       });
     }
