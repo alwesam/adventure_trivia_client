@@ -3,13 +3,13 @@ import React from 'react';
 var CreateFinalComp = React.createClass({
 
   onSubmit: function () {
-    //TODO
-    var jsonData = {adventure: {title:       this.props.title,
+    //TODO this is temporary and meant for development
+    //while redux store is sorted out
+    var jsonData = {token: "3:dmSp_6gTpawkn_4jafVv",
+                    adventure: {title:       this.props.title,
                                 description: this.props.description,
                                 challenges:  this.props.challenges}};
 
-    console.log("JSON DATA: ");
-    console.log(jsonData);
     var url ="http://stark-ridge-5017.herokuapp.com/adventures"; 
     
     $.ajax({
@@ -17,7 +17,6 @@ var CreateFinalComp = React.createClass({
       url: url,
       data: jsonData,
       success: function (data) {
-        console.log(data);
       }.bind(this)
     });
   },

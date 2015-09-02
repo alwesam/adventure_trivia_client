@@ -1,4 +1,5 @@
-import { LOGIN, LOGOUT } from '../actions/actions.js';
+import { combineReducers } from 'redux'
+import { LOGIN, LOGOUT, ADD_TOKEN } from '../actions/actions.js';
 
 function loginUser(state=0, action) {
   switch (action.type) {
@@ -11,4 +12,20 @@ function loginUser(state=0, action) {
   }
 }
 
+function addToken(state=0, action) {
+  switch (action.type) {
+    //TODO check
+    case ADD_TOKEN:
+      return action.text;
+    default:
+      return "";
+  }
+}
+
+var accessUser = combineReducers({
+  loginUser,
+  addToken
+});
+
+//export default accessUser;
 export default loginUser;

@@ -24822,6 +24822,8 @@
 	  value: true
 	});
 
+	var _redux = __webpack_require__(197);
+
 	var _actionsActionsJs = __webpack_require__(216);
 
 	function loginUser(state, action) {
@@ -24837,6 +24839,24 @@
 	  }
 	}
 
+	function addToken(state, action) {
+	  if (state === undefined) state = 0;
+
+	  switch (action.type) {
+	    //TODO check
+	    case _actionsActionsJs.ADD_TOKEN:
+	      return action.text;
+	    default:
+	      return "";
+	  }
+	}
+
+	var accessUser = (0, _redux.combineReducers)({
+	  loginUser: loginUser,
+	  addToken: addToken
+	});
+
+	//export default accessUser;
 	exports['default'] = loginUser;
 	module.exports = exports['default'];
 
@@ -24858,11 +24878,15 @@
 	});
 	exports.login = login;
 	exports.logout = logout;
+	exports.add_token = add_token;
 	var LOGIN = 'LOGIN';
 	exports.LOGIN = LOGIN;
 	var LOGOUT = 'LOGOUT';
 
 	exports.LOGOUT = LOGOUT;
+	var ADD_TOKEN = 'ADD_TOKEN';
+
+	exports.ADD_TOKEN = ADD_TOKEN;
 	/*
 	 * action creators
 	 */
@@ -24873,6 +24897,10 @@
 
 	function logout() {
 	  return { type: LOGOUT };
+	}
+
+	function add_token(text) {
+	  return { type: ADD_TOKEN, text: text };
 	}
 
 	/* REACT HOT LOADER */ }).call(this); if (false) { (function () { module.hot.dispose(function (data) { data.makeHot = module.makeHot; }); if (module.exports && module.makeHot) { var makeExportsHot = require("/home/alwesam/finalproject/adventure_trivia_client/node_modules/react-hot-loader/makeExportsHot.js"), foundReactClasses = false; if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot not apply hot update to " + "actions.js" + ": " + err.message); } }); } } })(); }
@@ -25600,22 +25628,20 @@
 	  displayName: "CreateFinalComp",
 
 	  onSubmit: function onSubmit() {
-	    //TODO
-	    var jsonData = { adventure: { title: this.props.title,
+	    //TODO this is temporary and meant for development
+	    //while redux store is sorted out
+	    var jsonData = { token: "3:dmSp_6gTpawkn_4jafVv",
+	      adventure: { title: this.props.title,
 	        description: this.props.description,
 	        challenges: this.props.challenges } };
 
-	    console.log("JSON DATA: ");
-	    console.log(jsonData);
 	    var url = "http://stark-ridge-5017.herokuapp.com/adventures";
 
 	    $.ajax({
 	      type: "POST",
 	      url: url,
 	      data: jsonData,
-	      success: (function (data) {
-	        console.log(data);
-	      }).bind(this)
+	      success: (function (data) {}).bind(this)
 	    });
 	  },
 
